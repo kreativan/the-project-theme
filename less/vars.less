@@ -1,0 +1,195 @@
+//
+// Component:       Variables
+// Description:     Defines common values which are used across all components
+//
+// ========================================================================
+
+
+// Load deprecated components
+// ========================================================================
+
+@deprecated:                                   false;
+
+
+// Breakpoints
+// ========================================================================
+
+// Phone Portrait:   Galaxy (360x640), iPhone 6 (375x667), iPhone 6+ (414x736)
+// Phone Landscape:  Galaxy (640x360), iPhone 6 (667x375), iPhone 6+ (736x414)
+// Tablet Portrait:  iPad (768x1024), Galaxy Tab (800x1280),
+// Tablet Landscape: iPad (1024x768), iPad Pro (1024x1366),
+// Desktop:          Galaxy Tab (1280x800), iPad Pro (1366x1024)
+
+@breakpoint-small:                             640px;  // Phone landscape
+@breakpoint-medium:                            960px;  // Tablet Landscape
+@breakpoint-large:                             1200px; // Desktop
+@breakpoint-xlarge:                            1600px; // Large Screens
+
+@breakpoint-xsmall-max:                        (@breakpoint-small - 1);
+@breakpoint-small-max:                         (@breakpoint-medium - 1);
+@breakpoint-medium-max:                        (@breakpoint-large - 1);
+@breakpoint-large-max:                         (@breakpoint-xlarge - 1);
+
+//  Container
+// ===========================================================
+
+@container-max-width:                   1200px;
+@container-xsmall-max-width:            750px;
+@container-small-max-width:             900px;
+@container-large-max-width:             1400px;
+@container-xlarge-max-width:            1600px;
+
+@container-padding-horizontal:          15px;
+@container-padding-horizontal-s:        @global-gutter;
+@container-padding-horizontal-m:        @global-medium-gutter;
+
+//  Section 
+// ===========================================================
+
+@section-padding-vertical:                        @global-medium-margin;
+@section-padding-vertical-m:                      @global-large-margin;
+
+@section-xsmall-padding-vertical:                 @global-margin;
+
+@section-small-padding-vertical:                  @global-medium-margin;
+
+@section-large-padding-vertical:                  @global-large-margin;
+@section-large-padding-vertical-m:                @global-xlarge-margin;
+
+@section-xlarge-padding-vertical:                 @global-xlarge-margin;
+@section-xlarge-padding-vertical-m:               (@global-large-margin + @global-xlarge-margin);
+
+
+// Global variables
+// ========================================================================
+
+//
+// Typography
+//
+
+@global-font-family:                            -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+@global-font-size:                              18px;
+@global-line-height:                            1.6;      // 24px
+
+@base-heading-font-family:                      @global-font-family;
+@base-heading-font-weight:                      normal;
+@base-heading-color:                            @global-emphasis-color;
+@base-heading-text-transform:                   none;
+
+@global-2xlarge-font-size:                      2.625rem; // 42px
+@global-xlarge-font-size:                       2rem;     // 32px
+@global-large-font-size:                        1.5rem;   // 24px
+@global-medium-font-size:                       1.2rem;  // 20px
+@global-small-font-size:                        0.85rem; // 14px
+
+@base-heading-margin-top:                       @global-medium-margin;
+@base-h1-font-size-m:                           @global-2xlarge-font-size;
+@base-h1-font-size:                             @base-h1-font-size-m * 0.85;
+@base-h1-line-height:                           1.2;
+@base-h2-font-size-m:                           @global-xlarge-font-size;
+@base-h2-font-size:                             @base-h2-font-size-m * 0.85;
+@base-h2-line-height:                           1.3;
+@base-h3-font-size:                             @global-large-font-size;
+@base-h3-line-height:                           1.4;
+@base-h4-font-size:                             @global-medium-font-size;
+@base-h4-line-height:                           1.4;
+@base-h5-font-size:                             @global-font-size;
+@base-h5-line-height:                           1.4;
+@base-h6-font-size:                             @global-small-font-size;
+@base-h6-line-height:                           1.4;
+
+//
+// Colors
+//
+
+@global-color:                                  #333;
+@global-emphasis-color:                         #191919;
+@global-muted-color:                            #777;
+
+@global-link-color:                             #1e87f0;
+@global-link-hover-color:                       #0f6ecd;
+
+@global-inverse-color:                          #fff;
+
+//
+// Backgrounds
+//
+
+@global-background:                             #fff;
+
+@global-muted-background:                       #f8f8f8;
+@global-primary-background:                     #1e87f0;
+@global-secondary-background:                   #222;
+
+@global-success-background:                     #2cbd8d;
+@global-warning-background:                     #faa05a;
+@global-danger-background:                      #f0506e;
+
+@tm-background-dark:                          #222;
+
+//
+// Borders
+//
+
+@global-border-width:                           1px;
+@global-border:                                 #e5e5e5;
+@tm-border-radius:                              5px;
+@border-rounded-border-radius:                  @tm-border-radius;
+//
+// Box-Shadows
+//
+
+@global-small-box-shadow:                       0 2px 8px rgba(0,0,0,0.08);
+@global-medium-box-shadow:                      0 5px 15px rgba(0,0,0,0.08);
+@global-large-box-shadow:                       0 14px 25px rgba(0,0,0,0.16);
+@global-xlarge-box-shadow:                      0 28px 50px rgba(0,0,0,0.16);
+
+//
+// Spacings
+//
+
+// Used in margin, section, list
+@global-margin:                                 20px;
+@global-small-margin:                           10px;
+@global-medium-margin:                          40px;
+@global-large-margin:                           70px;
+@global-xlarge-margin:                          140px;
+
+// Used in grid, column, container, align, card, padding
+@global-gutter:                                 30px;
+@global-small-gutter:                           15px;
+@global-medium-gutter:                          40px;
+@global-large-gutter:                           70px;
+
+//
+// Controls
+//
+
+@global-control-height:                         40px;
+@global-control-small-height:                   30px;
+@global-control-large-height:                   55px;
+
+//
+// Z-index
+//
+
+@global-z-index:                                1000;
+
+
+// Inverse
+// ========================================================================
+
+@inverse-global-color-mode:                     light;
+
+@inverse-global-color:                          fade(@global-inverse-color, 80%);
+@inverse-global-emphasis-color:                 @global-inverse-color;
+@inverse-global-muted-color:                    fade(@global-inverse-color, 60%);
+@inverse-global-inverse-color:                  @global-color;
+
+@inverse-global-primary-background:             @global-inverse-color;
+@inverse-global-muted-background:               fade(@global-inverse-color, 10%);
+
+@inverse-global-border:                         fade(@global-inverse-color, 20%);
+
+//  Overlay
+// ===========================================================
