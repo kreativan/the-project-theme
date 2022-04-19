@@ -79,3 +79,22 @@ function latest_movies($atts, $content = null, $tag = '') {
   return ob_get_clean();
 }
 add_shortcode('latest_movies', 'latest_movies');
+
+
+//-------------------------------------------------------- 
+//  Functions
+//-------------------------------------------------------- 
+
+function media_url($slug) {
+
+  $args = array(
+    'post_type' => 'attachment',
+    'name' => sanitize_title($slug),
+    'posts_per_page' => 1,
+    'post_status' => 'inherit',
+  );
+  $_header = get_posts( $args );
+  $header = $_header ? array_pop($_header) : null;
+  return $header ? wp_get_attachment_url($header->ID) : '';
+
+}
