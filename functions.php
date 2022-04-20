@@ -4,6 +4,15 @@ function dump($var) {
   echo '<pre>',print_r($var,1),'</pre>';
 }
 
+/**
+ *  Custom Image Sizes
+ *  
+ */
+add_image_size('logo', 180, 42, false);
+add_image_size("blog-large", 900, 400, true);
+add_image_size("blog-small", 300, 200, false);
+
+
 //
 // Options
 //
@@ -12,10 +21,6 @@ add_theme_support('title-tag');
 add_theme_support('menus');
 add_theme_support('post-thumbnails');
 add_theme_support('widgets');
-
-// Custom Image Sizes
-add_image_size("blog-large", 900, 400, true);
-add_image_size("blog-small", 300, 200, false);
 
 
 // Sidebars - Widget Positions
@@ -84,6 +89,43 @@ add_shortcode('latest_movies', 'latest_movies');
 //-------------------------------------------------------- 
 //  Functions
 //-------------------------------------------------------- 
+
+function page_builder($args = []) {
+
+  $flexible_content_field = !empty($args['flexible_content_field']) ? $args['flexible_content_field'] : 'page_builder';
+  $container = !empty($args['container']) && $args['container'] == "true" ? true : false;
+  $class = !empty($args['class']) ? " {$args['class']}" : "";
+
+  if(have_rows($flexible_content_field)) {
+    while(have_rows($flexible_content_field)) {
+
+      the_row();
+
+      $layout = get_row_layout();
+      $file = get_template_directory() . "/blocks/$layout.php";
+
+      $main_class = $class;
+      $layout_class = "";
+
+      if(isset($args[$layout]) && !empty($args[$layout])) {
+        $main_class = "";
+        $layout_class = " {$args[$layout]}";
+      } 
+
+      if(file_exists($file)) {
+        echo "<div class='block block-{$layout}{$main_class}{$layout_class}'>";
+        if($container) echo "<div class='uk-container'>";
+        get_template_part("blocks/$layout");
+        if($container) echo "</div>";
+        echo "</div>";
+      } else {
+        echo "<div class='uk-alert uk-alert-danger'>/blocks/{$layout}.php does not exists</div>";
+      }
+    }
+
+  }
+
+}
 
 function media_url($slug) {
 

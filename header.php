@@ -1,6 +1,11 @@
 <?php
+// Logo
+$logo = !empty( get_field('logo', 'options') ) ? get_field('logo', 'options') : false;
+
+// Less compiler
 $lessCompiler = new Less_Compiler;
 
+// Project settings
 $dev_mode = the_project('dev_mode') == '1' ? true : false;
 $assets_suffix = the_project('assets_suffix');
 
@@ -96,7 +101,16 @@ uk-sticky="show-on-up: true; animation: uk-animation-slide-top">
 
       <div class="logo uk-flex uk-flex-middle">
         <a href="/" class="uk-h4 uk-text-bold uk-margin-remove uk-link-reset uk-text-emphasis">
+        <?php if($logo) :?>
+          <img 
+            src="<?= $logo['sizes']['logo'] ?>" 
+            alt="<?= get_option("blogname"); ?>" 
+            width="<?= $logo['sizes']['logo-width'] ?>" 
+            height="<?= $logo['sizes']['logo-height'] ?>" 
+          />
+        <?php else : ?>
           <?= get_option("blogname"); ?>
+        <?php endif; ?>
         </a>
       </div>
 

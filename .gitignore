@@ -1,0 +1,13 @@
+# Ignore installed npm modules
+node_modules/
+
+# Ignore folders from source code editors
+.vscode
+
+# Ignore Mac OS .DS_Store
+.DS_Store
+
+# Ignore cache
+assets/cache/
+assets/cache/*
+assets/cache/**

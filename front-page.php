@@ -1,15 +1,29 @@
+<?php
+/**
+ *  Template Name: Home Page
+ */
+?>
+
 <?php get_header(); ?>
 
-<section class="uk-section">
-  <div class="uk-container">
+<?php get_template_part("includes/hero"); ?>
 
-    <h1><?php the_title(); ?></h1>
+<div class="uk-container uk-margin-large-top">
 
+  <div class="uk-padding tm-bg-white uk-box-shadow-medium uk-border-rounded">
     <?php get_template_part('searchform'); ?>
-
-    <?php get_template_part('includes/content'); ?>
-
   </div>
-</section>
+
+</div>
+
+<?php 
+page_builder([
+  "container" => "true",
+  "class" => "uk-margin-large",
+  //"editor" => 'uk-background-primary uk-light uk-section',
+]);
+?>
+
+
 
 <?php get_footer(); ?>

@@ -18,7 +18,7 @@ $htmx_req = [
 
     <h1><?= the_title(); ?></h1>
 
-    <div class="uk-margin uk-padding uk-background-muted">
+    <div class="uk-margin uk-padding tm-bg-white uk-box-shadow-medium">
 
       <?= the_content() ?>
     

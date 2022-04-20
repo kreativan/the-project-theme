@@ -50,9 +50,9 @@ $query = new WP_Query($args);
 
 <div class="uk-container tm-container-margin">
 
-  <div class="uk-section-muted uk-padding">
+  <div class="tm-bg-white uk-box-shadow-medium uk-padding">
 
-    <h1 class="uk-h2"><?= the_title() ?></h1>
+    <h1 class="uk-h3"><?= the_title() ?></h1>
 
     <?php get_template_part('katalog/katalog-search-form'); ?>
 
@@ -60,7 +60,7 @@ $query = new WP_Query($args);
 
   <?php get_template_part('includes/content'); ?>
 
-  <div class="uk-margin-medium">
+  <div class="uk-margin-large">
 
     <?php if( $query->have_posts() ) :?>
     <div class="uk-grid uk-child-width-1-5@l uk-child-width-1-3@s " uk-grid>

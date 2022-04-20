@@ -2,8 +2,8 @@
 
 <div class="uk-container uk-container-small tm-container-margin">
 
-  <div class="uk-background-muted uk-padding uk-margin-medium-bottom">
-    <h1>Search</h1>
+  <div class="tm-bg-white uk-box-shadow-medium uk-padding uk-margin-medium-bottom">
+    <h1 class="uk-h3">Search</h1>
     <?php get_search_form(); ?>
   </div>
 
