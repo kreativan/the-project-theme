@@ -10,7 +10,7 @@
 
 <div class="uk-container uk-margin-large-top">
 
-  <div class="uk-padding tm-bg-white uk-box-shadow-medium uk-border-rounded">
+  <div class="uk-padding uk-background-muted">
     <?php get_template_part('searchform'); ?>
   </div>
 

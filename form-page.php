@@ -12,7 +12,7 @@
 
   <?= the_content() ?>
 
-  <div class="uk-padding tm-bg-white uk-box-shadow-medium uk-margin">
+  <div class="uk-padding uk-background-muted uk-margin">
     <form id="form-test" action="/ajax/form-test/" method="POST" class="uk-form-stacked">
 
       <input type="hidden" name="test_form" value="1" />

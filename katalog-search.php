@@ -50,7 +50,7 @@ $query = new WP_Query($args);
 
 <div class="uk-container tm-container-margin">
 
-  <div class="tm-bg-white uk-box-shadow-medium uk-padding">
+  <div class="uk-background-muted uk-padding">
 
     <h1 class="uk-h3"><?= the_title() ?></h1>
 

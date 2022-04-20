@@ -32,7 +32,7 @@ if(!empty($hero_image)) {
     <?php endif; ?>
 
     <?php if(!empty($hero_subtitle)) :?>
-    <h2 class="uk-margin-remove uk-text-light"><?= $hero_subtitle ?></h2>
+    <h2 class="uk-margin uk-text-light"><?= $hero_subtitle ?></h2>
     <?php endif; ?>
 
     <?php if(!empty($hero_text)) :?>
