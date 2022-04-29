@@ -4,6 +4,10 @@ function dump($var) {
   echo '<pre>',print_r($var,1),'</pre>';
 }
 
+// Init Translations
+load_theme_textdomain('default', get_template_directory());
+
+
 /**
  *  Custom Image Sizes
  *  
