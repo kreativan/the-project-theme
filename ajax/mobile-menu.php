@@ -1,7 +1,5 @@
 <?php
-
-$project = new The_Project_Func;
-$mobile_menu = $project->menu_items('navbar');
+$mobile_menu = the_project_menu('navbar');
 
 if(isset($_GET['actual_link'])) {
   $actual_link = $_GET['actual_link'];

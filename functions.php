@@ -1,13 +1,5 @@
 <?php
 
-function dump($var) {
-  echo '<pre>',print_r($var,1),'</pre>';
-}
-
-// Init Translations
-load_theme_textdomain('default', get_template_directory());
-
-
 /**
  *  Custom Image Sizes
  *  
@@ -15,16 +7,6 @@ load_theme_textdomain('default', get_template_directory());
 add_image_size('logo', 180, 42, false);
 add_image_size("blog-large", 900, 400, true);
 add_image_size("blog-small", 300, 200, false);
-
-
-//
-// Options
-//
-
-add_theme_support('title-tag');
-add_theme_support('menus');
-add_theme_support('post-thumbnails');
-add_theme_support('widgets');
 
 
 // Sidebars - Widget Positions

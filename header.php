@@ -1,4 +1,10 @@
 <?php
+// Site language
+$lang = get_option('WPLANG');
+$lang = explode("_", $lang);
+$lang = $lang[0];
+$lang = !empty($lang) ? $lang : 'en';
+
 // Logo
 $logo = !empty( get_field('logo', 'options') ) ? get_field('logo', 'options') : false;
 
@@ -34,7 +40,7 @@ $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https"
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= $lang ?>">
 <head>
 
   <meta charset="UTF-8">

@@ -27,8 +27,7 @@ if (!empty($_POST['contact_submit'])) {
   //  Validate
   //-------------------------------------------------------- 
 
-  $project = new The_Project_Func;
-  $v= $project->valitron($_POST, 'fr');
+  $v= the_project_valitron($_POST, 'fr');
   $v->rule('required', ['name', 'email', 'subject', 'message']); 
   $v->rule('email', 'email');
 

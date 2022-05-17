@@ -27,8 +27,7 @@ if($_POST['test_form']) {
   //  Validate
   //-------------------------------------------------------- 
   
-  $project = new The_Project_Func;
-  $v= $project->valitron($_POST);
+  $v = the_project_valitron($_POST);
   $v->rule('required', ['name', 'email', 'message']); 
   $v->rule('email', 'email');
 
