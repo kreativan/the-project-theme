@@ -7,9 +7,7 @@ $htmx_req = [
   "headline" => "Headline",
 ];
 
-
 ?>
-
 
 <?php get_header(); ?>
 
@@ -25,7 +23,7 @@ $htmx_req = [
       <button type="button" class="uk-button uk-button-primary"
         hx-post="/htmx/test/"
         hx-target="#target"
-        hx-swap="innerHTML"
+        hx-swap="outerHTML"
         hx-vals='<?= json_encode($htmx_req) ?>'
       >
         Load Content
@@ -33,7 +31,7 @@ $htmx_req = [
 
     </div>
 
-    <div id="target"></div>
+    <div id="target" class="uk-animation-slide-bottom-small"></div>
 
   </div>
 </div>

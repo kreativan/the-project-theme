@@ -11,7 +11,8 @@ $response = [
   //"redirect" => "/", // if used with modal, will redirect after modal confirm... 
   "errors" => [], // array of errors (strings), will trigger notification for each
   "error_fields" => [], // array of names for invalid fields
-  "post" => $_FILES,
+  "post" => $_POST,
+  "SMTP" => the_project('smtp_enable'),
 ];
 
 //
@@ -26,11 +27,24 @@ if (!empty($_POST['form_id'])) {
   $form_fields = get_field('form_fields', $form_id);
   $files_count = count($_FILES);
 
+  // captcha
+  $is_captcha = get_field('captcha', $form_id);
+  $captcha = true;
+  
+  if($is_captcha) {
+    $q1 = $_POST['q1'];
+    $q2 = $_POST['q2'];
+    $answ = $_POST['answ'];
+    $sum = $q1 + $q2;
+    $captcha = ($answ == $sum) ? true : false;
+  }
   
   $req_array = [];
   $email_array = [];
   $labels_array = [];
   $files_array = [];
+
+  if(!$captcha) $req_array[] = 'answ';
 
   foreach($form_fields as $f) {
     $labels_array[$f['name']] = $f['label'];
@@ -64,15 +78,17 @@ if (!empty($_POST['form_id'])) {
 
   $files_errors = ($is_files && ($files_count < $req_files_count)) ? true : false;
 
-  if(!$v->validate() || $files_errors) {
+  if(!$v->validate() || $files_errors || !$captcha) {
 
     // get errors from valitron and store them in errors array
     $errors = [];
     $errors_fields = [];
     foreach($v->errors() as $key => $value) {
-      $errors[] = $value[0]; 
+      if($key != "answ") $errors[] = $value[0]; 
       $errors_fields[] = $key;
     }
+
+    if(!$captcha) $errors[] = lng('Wrong Captcha');
 
     // trigger files errors
     if($files_errors) {
@@ -137,10 +153,44 @@ if (!empty($_POST['form_id'])) {
   // Create a Post
   // ===========================================================
 
-  if($create_post) {
+  $allow_post = $create_post ? true : false;
+  $allow_duplicated_posts = get_field('allow_duplicated_posts', $form_id);
+  $field_name_to_validate = get_field('field_name_to_validate', $form_id);
+
+  // handle duplicated posts
+  if($create_post && !$allow_duplicated_posts) {
+
+    $post = get_posts([
+      'numberposts'	=> 1,
+      'post_type'		=> $post_type_name,
+      'meta_key'		=> $field_name_to_validate,
+      'meta_value'	=> $_POST[$field_name_to_validate],
+    ]);
+
+    if($post) {
+
+      $allow_post = false;
+
+      $duplicate_message = get_field('duplicate_message', $form_id);
+      $duplicate_msg = the_project_str($duplicate_message, $_POST);
+      
+      $response["status"] = "warning";
+      $response['modal'] =  $duplicate_msg;
+      $response["reset_form"] = true;
+
+      header('Content-type: application/json');
+      echo json_encode($response);
+      exit();
+
+    }
+
+  }
+
+  // Create Post
+  if($create_post && $allow_post) {
 
     $post_title = get_field('new_post_title', $form_id);
-    $post_title = $project->str_replace($post_title, $_POST);
+    $post_title = the_project_str($post_title, $_POST);
     $post_title = !empty($post_title) ? $post_title : $post_type_name;
 
     $meta_input = [];
@@ -153,7 +203,6 @@ if (!empty($_POST['form_id'])) {
       foreach($post_files as $key => $value) $meta_input[$key] = $value;
     }
 
-    // Create lead
     $new_post = [
       'post_type' => $post_type_name,
       'post_title' => $post_title,
@@ -168,15 +217,21 @@ if (!empty($_POST['form_id'])) {
   //  Email
   // ===========================================================
 
+  $send_email = get_field('send_email', $form_id);
+
   if($send_email) {
 
     // Admin email
     $admin_email = get_field('admin_email', $form_id);
-    $admin_email = !empty($admin_email) ? $admin_email : get_option('admin_email');
+    $site_email = get_field('site_email', 'options');
+    $send_to = !empty($admin_email) ? $admin_email : $site_email;
+    // from
+    $mail_from_arr = explode(",", $send_to);
+    $mail_from = count($mail_from_arr) ? $mail_from_arr[0] : $send_to;
 
     // Subject
     $subject = get_field('subject', $form_id);
-    $subject = $project->str_replace($subject, $_POST);
+    $subject = the_project_str($subject, $_POST);
     $subject = !empty($subject) ? $subject : "Website form submition";
 
     // reply to
@@ -192,16 +247,18 @@ if (!empty($_POST['form_id'])) {
     // Email headers
     $headers = [];
     $headers[] = 'Content-Type: text/html; charset=UTF-8';
-    $headers[] = "From: Website <{$admin_email}>";
+    if(the_project('smtp_enable') != '1') {
+      $headers[] = "From: Website <{$mail_from}>";
+    }
     $headers[] = "Reply-to: $reply_to";
-
-    // Email to who?
-    $send_to =  $admin_email;
 
     // Message
     $message = "";
+    $exclude_vars = ['nonce', 'form_id'];
     foreach($_POST as $key => $value) {
-      $message .= "<strong>{$key}</strong>: {$value}<br />";
+      if(!in_array($key, $exclude_vars) && !empty($value)) {
+        $message .= "<p><strong>{$key}</strong><br />{$value}</p>";
+      }
     }
 
     // attachments
@@ -215,7 +272,7 @@ if (!empty($_POST['form_id'])) {
     // Send Mail
     try {
 
-      wp_mail($sent_to, $subject, $message, $headers, $attachments);
+      wp_mail($send_to, $subject, $message, $headers, $attachments);
 
     } catch (Exception $e) {
 
@@ -230,9 +287,9 @@ if (!empty($_POST['form_id'])) {
   //  Response
   // ===========================================================
   $title = get_field('success_title', $form_id);
-  $title = $project->str_replace($title, $_POST);
+  $title = the_project_str($title, $_POST);
   $text = get_field('success_message', $form_id);
-  $text = $project->str_replace($text, $_POST);
+  $text = the_project_str($text, $_POST);
   $response_text = !empty($title) ? "<h3>$title</h3>" : '';
   $response_text .= !empty($text) ? "<p>$text</p>" : '';
   $response["modal"] =  $response_text;

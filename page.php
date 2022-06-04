@@ -1,10 +1,10 @@
 <?php get_header(); ?>
 
-<div class="uk-container tm-container-margin">
+<div class="uk-container tm-container-margin" uk-height-viewport="expand: true">
 
   <h1><?php the_title(); ?></h1>
 
-  <?php get_template_part('includes/content'); ?>
+  <?php the_content(); ?>
 
 </div>
 

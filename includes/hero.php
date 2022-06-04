@@ -4,24 +4,26 @@ $hero_subtitle = get_field('hero_subtitle');
 $hero_text = get_field('hero_text');
 $hero_image = get_field('hero_image');
 
+$is_bg = !empty($hero_image) ? true : false;
+
 $attr = "";
-$class = "";
+$class = "uk-section uk-section-large";
 
-if(!empty($hero_image)) {
-
+if($is_bg) {
   $bg = $hero_image['url'];
   $attr .= !empty($bg) ? "data-src='{$bg}' uk-img" : "";
-  $class .= "uk-section uk-section-large uk-light uk-background-cover uk-position-relative";
-
-} elseif($images_count > 1 ) {
-
+  $class .= " uk-light uk-background-cover uk-position-relative";
+} else {
+  $class .= " uk-background-muted";
 }
 
 ?>
 
 <div id="hero" class="<?= $class ?>" <?= $attr ?>>
 
+  <?php if($is_bg) : ?>
   <div class="uk-overlay uk-overlay-default uk-position-cover"></div>
+  <?php endif; ?>
 
   <div class="uk-container uk-position-relative">
 

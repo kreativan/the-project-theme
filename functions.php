@@ -5,8 +5,10 @@
  *  
  */
 add_image_size('logo', 180, 42, false);
-add_image_size("blog-large", 900, 400, true);
-add_image_size("blog-small", 300, 200, false);
+add_image_size('hero', 1920, null, false);
+add_image_size('container', 1200, null, false);
+add_image_size('x640', 640, null, false);
+add_image_size('x380', 380, null, false);
 
 
 // Sidebars - Widget Positions
@@ -70,59 +72,3 @@ function latest_movies($atts, $content = null, $tag = '') {
   return ob_get_clean();
 }
 add_shortcode('latest_movies', 'latest_movies');
-
-
-//-------------------------------------------------------- 
-//  Functions
-//-------------------------------------------------------- 
-
-function page_builder($args = []) {
-
-  $flexible_content_field = !empty($args['flexible_content_field']) ? $args['flexible_content_field'] : 'page_builder';
-  $container = !empty($args['container']) && $args['container'] == "true" ? true : false;
-  $class = !empty($args['class']) ? " {$args['class']}" : "";
-
-  if(have_rows($flexible_content_field)) {
-    while(have_rows($flexible_content_field)) {
-
-      the_row();
-
-      $layout = get_row_layout();
-      $file = get_template_directory() . "/blocks/$layout.php";
-
-      $main_class = $class;
-      $layout_class = "";
-
-      if(isset($args[$layout]) && !empty($args[$layout])) {
-        $main_class = "";
-        $layout_class = " {$args[$layout]}";
-      } 
-
-      if(file_exists($file)) {
-        echo "<div class='block block-{$layout}{$main_class}{$layout_class}'>";
-        if($container) echo "<div class='uk-container'>";
-        get_template_part("blocks/$layout");
-        if($container) echo "</div>";
-        echo "</div>";
-      } else {
-        echo "<div class='uk-alert uk-alert-danger'>/blocks/{$layout}.php does not exists</div>";
-      }
-    }
-
-  }
-
-}
-
-function media_url($slug) {
-
-  $args = array(
-    'post_type' => 'attachment',
-    'name' => sanitize_title($slug),
-    'posts_per_page' => 1,
-    'post_status' => 'inherit',
-  );
-  $_header = get_posts( $args );
-  $header = $_header ? array_pop($_header) : null;
-  return $header ? wp_get_attachment_url($header->ID) : '';
-
-}

@@ -5,8 +5,9 @@ $lang = explode("_", $lang);
 $lang = $lang[0];
 $lang = !empty($lang) ? $lang : 'en';
 
-// Logo
+// Site Settings
 $logo = !empty( get_field('logo', 'options') ) ? get_field('logo', 'options') : false;
+$site_name = get_field('site_name', 'options');
 
 // Less compiler
 $lessCompiler = new Less_Compiler;
@@ -18,9 +19,12 @@ $assets_suffix = the_project('assets_suffix');
 // Less files
 $less_files = [get_template_directory() . "/less/import.less"];
 $less_vars = [
-  "global-font-family" => "Jost, Sans Serif",
-  "base-heading-font-family" => "Jost, Sans Serif",
+  "global-font-family" => "'Roboto Flex', sans-serif",
+  "base-heading-font-family" => "'Roboto Flex', sans-serif",
 ];
+
+// Google Fonts LInk
+$google_fonts_link = "https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,700&display=swap";
 
 // js_files
 $js_files = [
@@ -68,7 +72,8 @@ $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https"
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,700;1,300;1,700&family=Lato&family=Prata&display=swap" rel="stylesheet"> 
+  <link rel="preload" as="style" href="<?= $google_fonts_link ?>">
+  <link href="<?= $google_fonts_link ?>" rel="stylesheet"> 
 
 </head>
 
@@ -102,25 +107,25 @@ uk-sticky="show-on-up: true; animation: uk-animation-slide-top">
 <header id="header" class="uk-visible@l"
   uk-sticky="show-on-up: true; animation: uk-animation-slide-top"
 >
-  <div class="uk-container">
+  <div class="uk-container uk-container-expand">
     <nav class="uk-navbar-container uk-navbar uk-navbar-transparent" uk-navbar>
 
-      <div class="logo uk-flex uk-flex-middle">
+      <div class="uk-navbar-left logo uk-flex uk-flex-middle">
         <a href="/" class="uk-h4 uk-text-bold uk-margin-remove uk-link-reset uk-text-emphasis">
         <?php if($logo) :?>
           <img 
             src="<?= $logo['sizes']['logo'] ?>" 
-            alt="<?= get_option("blogname"); ?>" 
+            alt="<?= $site_name ?>" 
             width="<?= $logo['sizes']['logo-width'] ?>" 
             height="<?= $logo['sizes']['logo-height'] ?>" 
           />
         <?php else : ?>
-          <?= get_option("blogname"); ?>
+          <?= $site_name ?>
         <?php endif; ?>
         </a>
       </div>
 
-      <div class="uk-navbar-right">
+      <div class="uk-navbar-center">
         <?php
           if ( has_nav_menu('navbar') ) {
             wp_nav_menu([
@@ -130,6 +135,12 @@ uk-sticky="show-on-up: true; animation: uk-animation-slide-top">
             ]);
           }
         ?>
+      </div>
+
+      <div class="uk-navbar-right">
+        <button type="button" class="uk-button uk-button-primary uk-button-small">
+          Button
+        </button>
       </div>
 
     </nav>

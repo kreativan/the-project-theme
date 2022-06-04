@@ -1,9 +1,17 @@
 <?php get_header();?>
 
+<?php
+$page = get_field('katalog_archive_page', 'options');
+
+$headline = get_field('headline', $page);
+$bg = get_field('background', $page);
+
+?>
+
 <div class="uk-container tm-container-margin">
 
   <h1 class="uk-heading-medium">
-    Katalog
+    <?= $headline ?>
   </h1>
 
   <div class="uk-margin">

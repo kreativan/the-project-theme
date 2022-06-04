@@ -9,10 +9,8 @@
 <?php get_template_part('includes/page-heading'); ?>
 
 <div class="uk-container tm-container-margin">
-<?php 
-page_builder([
-  "class" => "uk-margin-medium"
-]); 
+<?php
+  get_template_part("includes/page-builder");
 ?>
 </div>
 
