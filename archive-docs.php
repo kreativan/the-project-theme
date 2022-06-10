@@ -1,4 +1,12 @@
 <?php get_header(); ?>
+<?php 
+query_posts([
+  'post_type' => 'docs',
+  'orderby' => 'title',
+  'order' => 'ASC',
+  'posts_per_page' => -1,
+]); 
+?>
 
 <div class="uk-container uk-container-small tm-container-margin" uk-height-viewport="expand: true">
 
@@ -9,7 +17,9 @@
     <li>
       <h2 class="uk-h4">
         <a class="uk-link-heading uk-flex uk-flex-between uk-flex-middle" href="<?= the_permalink() ?>" title="<?php the_title() ?>">
-          <span><?php the_title(); ?></span>
+          <span>
+            <?php the_title(); ?>
+          </span>
           <i uk-icon="arrow-right"></i>
         </a> 
       </h2>

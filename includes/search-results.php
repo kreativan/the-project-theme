@@ -1,7 +1,7 @@
 <?php 
 $i = 0;
 
-if( have_posts() ) : while( have_posts() ) : the_post(); ?>
+if( have_posts() && get_the_title() != 'Search') : while( have_posts() ) : the_post(); ?>
 
   <?php if($i++ > 0) echo "<hr class='uk-margin-medium' />"; ?>
 
@@ -9,7 +9,7 @@ if( have_posts() ) : while( have_posts() ) : the_post(); ?>
 
     <?php if(has_post_thumbnail()) : ?>
     <div class="uk-grid" uk-grid>
-      <div class="uk-width-auto@m">
+      <div class="uk-width-1-3@m">
         <img src="<?= the_post_thumbnail_url('blog-small') ?>" loading="lazy" alt="<?php the_title(); ?>" />
       </div>
       <div class="uk-width-expand@m">

@@ -10,6 +10,7 @@ add_image_size('container', 1200, null, false);
 add_image_size('x640', 640, null, false);
 add_image_size('x380', 380, null, false);
 
+add_image_size('movie_card', 270, 400, true);
 
 // Sidebars - Widget Positions
 function widget_positions() {
@@ -65,10 +66,10 @@ function hello_shortcode() {
 }
 add_shortcode('hello', 'hello_shortcode');
 
-function latest_movies($atts, $content = null, $tag = '') {
+function katalog_feed($atts, $content = null, $tag = '') {
   ob_start();
   set_query_var("attributes", $atts);
-  get_template_part('katalog/katalog-latest');
+  get_template_part('katalog/katalog-feed');
   return ob_get_clean();
 }
-add_shortcode('latest_movies', 'latest_movies');
+add_shortcode('katalog', 'katalog_feed');

@@ -2,7 +2,7 @@
 
 <div class="uk-container tm-container-margin">
 
-  <h1 class="uk-heading-medium uk-text-bold">
+  <h1 class="uk-heading-medium">
     <?= single_cat_title(); ?>
   </h1>
 

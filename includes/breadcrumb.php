@@ -29,9 +29,12 @@ foreach($arr as $item) {
 
 }
 
+$category = false;
 $taxy = get_taxonomies('','names');
-$categories = wp_get_post_terms($term->ID, $taxy);
-$category = count($categories) > 0 ? $categories[0] : false;
+if(!empty($term->ID)) {
+  $categories = wp_get_post_terms($term->ID, $taxy);
+  $category = count($categories) > 0 ? $categories[0] : false;
+}
 ?>
 
 <ul class="uk-breadcrumb<?= $class ?>">

@@ -13,12 +13,6 @@ if( have_posts() ) : while( have_posts() ) : the_post(); ?>
     <?php
       if(has_post_thumbnail()) {
         echo get_the_post_thumbnail(null, 'container');
-        //dump($image);
-        /*
-        picture($image, [
-          "alt" => get_the_title(),
-        ]);
-        */
       }
     ?>
 

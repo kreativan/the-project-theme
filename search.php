@@ -1,6 +1,13 @@
+<?php
+/** 
+ *  Template Name: Search
+ */ 
+?>
+
 <?php get_header(); ?>
 
 <div class="uk-container uk-container-small tm-container-margin">
+<div uk-height-viewport="expand: true;">
 
   <div class="uk-background-muted uk-padding uk-margin-medium-bottom">
     <h1 class="uk-h3">Search</h1>
@@ -14,6 +21,7 @@
     get_template_part('includes/pagination', null);
   ?>
 
+</div>
 </div>
 
 <?php get_footer(); ?>

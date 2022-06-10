@@ -1,34 +1,39 @@
 <?php get_header(); 
 $categories = get_the_terms($post->ID, "katalog_category");
 $custom_fields = get_fields($post->ID);
-// $custom_fields_groups = acf_get_field_groups();
 ?>
 
 
 <div class="uk-container tm-container-margin">
 
-  <div class="uk-grid" uk-grid>
+  <div class="uk-grid uk-grid-match" uk-grid>
 
     <?php if(has_post_thumbnail()) : ?>
-    <div class="uk-width-2-5@m">
+    <div class="uk-width-1-3@m">
       <div class="uk-panel">
-        <img src="<?= the_post_thumbnail_url() ?>" loading="lazy" alt="<?php the_title(); ?>" />
+        <?php
+          if(has_post_thumbnail()) {
+            echo get_the_post_thumbnail(null, 'x380');
+          }
+        ?>
       </div>
     </div>
     <?php endif; ?>
 
     <div class="uk-width-expand@m">
-      <div class="uk-background-muted uk-padding">
+      <div>
 
         <h1><?php the_title(); ?></h1>
 
-        <?php foreach($categories as $cat) : ?>
-        <span class="uk-label uk-label-primary">
-          <a class="uk-light uk-link-reset" href="<?= get_category_link($cat->term_id) ?>" title="<?= $cat->name ?>">
-            <?= $cat->name ?>
-          </a>
-        </span>
-        <?php endforeach; ?>
+        <?php if($categories) : ?>
+          <?php foreach($categories as $cat) : ?>
+          <span class="uk-label uk-label-primary">
+            <a class="uk-light uk-link-reset" href="<?= get_category_link($cat->term_id) ?>" title="<?= $cat->name ?>">
+              <?= $cat->name ?>
+            </a>
+          </span>
+          <?php endforeach; ?>
+        <?php endif; ?>
         
         <ul class="uk-list uk-list-striped">
           <?php foreach($custom_fields as $key => $value) :?>

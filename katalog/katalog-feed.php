@@ -3,7 +3,10 @@ $attributes = get_query_var('attributes');
 
 $args = [
   'post_type' => 'katalog',
-  'posts_per_page' => isset($attributes['limit']) ? $attributes['limit'] : 5 ,
+  'posts_per_page' => isset($attributes['limit']) ? $attributes['limit'] : 5,
+  'order' => 'DESC',
+  'orderby' => 'meta_value',
+  'meta_key' => 'featured',
   //'meta_key' => 'maker',
   //'meta_value' => 'Nintendo',
   //'meta_query' => [],
