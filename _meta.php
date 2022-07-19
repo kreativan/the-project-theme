@@ -47,3 +47,7 @@ add_filter( 'pre_get_document_title', function( $title ) {
 <?php endif; ?>
 <meta property="twitter:url" content="<?= $permalink ?>">
 <meta property="twitter:title" content="<?= !empty($seo_title) ? $seo_title : the_title() ?>">
+
+<?php
+echo "\n";
+?>
