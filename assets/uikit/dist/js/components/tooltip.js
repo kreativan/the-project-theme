@@ -1,4 +1,4 @@
-/*! UIkit 3.12.2 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
+/*! UIkit 3.15.1 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('uikit-util')) :
@@ -25,6 +25,7 @@
         cls: Boolean,
         animation: 'list',
         duration: Number,
+        velocity: Number,
         origin: String,
         transition: String },
 
@@ -33,28 +34,11 @@
         cls: false,
         animation: [false],
         duration: 200,
+        velocity: 0.2,
         origin: false,
-        transition: 'linear',
+        transition: 'ease',
         clsEnter: 'uk-togglabe-enter',
-        clsLeave: 'uk-togglabe-leave',
-
-        initProps: {
-          overflow: '',
-          height: '',
-          paddingTop: '',
-          paddingBottom: '',
-          marginTop: '',
-          marginBottom: '' },
-
-
-        hideProps: {
-          overflow: 'hidden',
-          height: 0,
-          paddingTop: 0,
-          paddingBottom: 0,
-          marginTop: 0,
-          marginBottom: 0 } },
-
+        clsLeave: 'uk-togglabe-leave' },
 
 
       computed: {
@@ -63,7 +47,7 @@
         },
 
         hasTransition(_ref2) {let { animation } = _ref2;
-          return this.hasAnimation && animation[0] === true;
+          return ['slide', 'reveal'].some((transition) => uikitUtil.startsWith(animation[0], transition));
         } },
 
 
@@ -82,9 +66,9 @@
             uikitUtil.isFunction(animate) ?
             animate :
             animate === false || !this.hasAnimation ?
-            this._toggle :
+            toggleInstant(this) :
             this.hasTransition ?
-            toggleHeight(this) :
+            toggleTransition(this) :
             toggleAnimation(this))(
             el, show);
 
@@ -148,44 +132,115 @@
 
 
 
-    function toggleHeight(_ref3) {let { isToggled, duration, initProps, hideProps, transition, _toggle } = _ref3;
+    function toggleInstant(_ref3) {let { _toggle } = _ref3;
       return (el, show) => {
-        const inProgress = uikitUtil.Transition.inProgress(el);
-        const inner = el.hasChildNodes() ?
-        uikitUtil.toFloat(uikitUtil.css(el.firstElementChild, 'marginTop')) +
-        uikitUtil.toFloat(uikitUtil.css(el.lastElementChild, 'marginBottom')) :
-        0;
-        const currentHeight = uikitUtil.isVisible(el) ? uikitUtil.height(el) + (inProgress ? 0 : inner) : 0;
-
+        uikitUtil.Animation.cancel(el);
         uikitUtil.Transition.cancel(el);
+        return _toggle(el, show);
+      };
+    }
 
-        if (!isToggled(el)) {
+    function toggleTransition(cmp) {var _cmp$animation$;
+      const [mode = 'reveal', startProp = 'top'] = ((_cmp$animation$ = cmp.animation[0]) == null ? void 0 : _cmp$animation$.split('-')) || [];
+
+      const dirs = [
+      ['left', 'right'],
+      ['top', 'bottom']];
+
+      const dir = dirs[uikitUtil.includes(dirs[0], startProp) ? 0 : 1];
+      const end = dir[1] === startProp;
+      const props = ['width', 'height'];
+      const dimProp = props[dirs.indexOf(dir)];
+      const marginProp = "margin-" + dir[0];
+      const marginStartProp = "margin-" + startProp;
+
+      return async (el, show) => {
+        let { duration, velocity, transition, _toggle } = cmp;
+
+        let currentDim = uikitUtil.dimensions(el)[dimProp];
+
+        const inProgress = uikitUtil.Transition.inProgress(el);
+        await uikitUtil.Transition.cancel(el);
+
+        if (show) {
           _toggle(el, true);
         }
 
-        uikitUtil.height(el, '');
+        const prevProps = Object.fromEntries(
+        [
+        'padding',
+        'border',
+        'width',
+        'height',
+        'overflowY',
+        'overflowX',
+        marginProp,
+        marginStartProp].
+        map((key) => [key, el.style[key]]));
 
-        // Update child components first
-        uikitUtil.fastdom.flush();
 
-        const endHeight = uikitUtil.height(el) + (inProgress ? 0 : inner);
-        uikitUtil.height(el, currentHeight);
+        const dim = uikitUtil.dimensions(el);
+        const currentMargin = uikitUtil.toFloat(uikitUtil.css(el, marginProp));
+        const marginStart = uikitUtil.toFloat(uikitUtil.css(el, marginStartProp));
+        const endDim = dim[dimProp] + marginStart;
 
-        return (
-        show ?
-        uikitUtil.Transition.start(
-        el,
-        { ...initProps, overflow: 'hidden', height: endHeight },
-        Math.round(duration * (1 - currentHeight / endHeight)),
-        transition) :
+        if (!inProgress && !show) {
+          currentDim += marginStart;
+        }
 
-        uikitUtil.Transition.start(
-        el,
-        hideProps,
-        Math.round(duration * (currentHeight / endHeight)),
-        transition).
-        then(() => _toggle(el, false))).
-        then(() => uikitUtil.css(el, initProps));
+        const [wrapper] = uikitUtil.wrapInner(el, '<div>');
+        uikitUtil.css(wrapper, {
+          boxSizing: 'border-box',
+          height: dim.height,
+          width: dim.width,
+          ...uikitUtil.css(el, [
+          'overflow',
+          'padding',
+          'borderTop',
+          'borderRight',
+          'borderBottom',
+          'borderLeft',
+          'borderImage',
+          marginStartProp]) });
+
+
+
+        uikitUtil.css(el, {
+          padding: 0,
+          border: 0,
+          minWidth: 0,
+          minHeight: 0,
+          [marginStartProp]: 0,
+          width: dim.width,
+          height: dim.height,
+          overflow: 'hidden',
+          [dimProp]: currentDim });
+
+
+        const percent = currentDim / endDim;
+        duration = (velocity * endDim + duration) * (show ? 1 - percent : percent);
+        const endProps = { [dimProp]: show ? endDim : 0 };
+
+        if (end) {
+          uikitUtil.css(el, marginProp, endDim - currentDim + currentMargin);
+          endProps[marginProp] = show ? currentMargin : endDim + currentMargin;
+        }
+
+        if (!end ^ mode === 'reveal') {
+          uikitUtil.css(wrapper, marginProp, -endDim + currentDim);
+          uikitUtil.Transition.start(wrapper, { [marginProp]: show ? 0 : -endDim }, duration, transition);
+        }
+
+        try {
+          await uikitUtil.Transition.start(el, endProps, duration, transition);
+        } finally {
+          uikitUtil.css(el, prevProps);
+          uikitUtil.unwrap(wrapper.firstChild);
+
+          if (!show) {
+            _toggle(el, false);
+          }
+        }
       };
     }
 
@@ -211,68 +266,86 @@
         pos: String,
         offset: null,
         flip: Boolean,
-        clsPos: String },
+        shift: Boolean,
+        inset: Boolean },
 
 
       data: {
         pos: "bottom-" + (uikitUtil.isRtl ? 'right' : 'left'),
-        flip: true,
         offset: false,
-        clsPos: '' },
+        flip: true,
+        shift: true,
+        inset: false },
 
 
-      computed: {
-        pos(_ref) {let { pos } = _ref;
-          return pos.split('-').concat('center').slice(0, 2);
-        },
-
-        dir() {
-          return this.pos[0];
-        },
-
-        align() {
-          return this.pos[1];
-        } },
-
+      connected() {
+        this.pos = this.$props.pos.split('-').concat('center').slice(0, 2);
+        [this.dir, this.align] = this.pos;
+        this.axis = uikitUtil.includes(['top', 'bottom'], this.dir) ? 'y' : 'x';
+      },
 
       methods: {
         positionAt(element, target, boundary) {
-          uikitUtil.removeClasses(element, this.clsPos + "-(top|bottom|left|right)(-[a-z]+)?");
+          let offset = [this.getPositionOffset(element), this.getShiftOffset(element)];
+          const placement = [this.flip && 'flip', this.shift && 'shift'];
 
-          let { offset } = this;
-          const axis = this.getAxis();
+          const attach = {
+            element: [this.inset ? this.dir : uikitUtil.flipPosition(this.dir), this.align],
+            target: [this.dir, this.align] };
 
-          if (!uikitUtil.isNumeric(offset)) {
-            const node = uikitUtil.$(offset);
-            offset = node ?
-            uikitUtil.offset(node)[axis === 'x' ? 'left' : 'top'] -
-            uikitUtil.offset(target)[axis === 'x' ? 'right' : 'bottom'] :
-            0;
+
+          if (this.axis === 'y') {
+            for (const prop in attach) {
+              attach[prop].reverse();
+            }
+            offset.reverse();
+            placement.reverse();
           }
 
-          const { x, y } = uikitUtil.positionAt(
-          element,
-          target,
-          axis === 'x' ?
-          uikitUtil.flipPosition(this.dir) + " " + this.align :
-          this.align + " " + uikitUtil.flipPosition(this.dir),
-          axis === 'x' ? this.dir + " " + this.align : this.align + " " + this.dir,
-          axis === 'x' ? "" + (
-          this.dir === 'left' ? -offset : offset) : " " + (
-          this.dir === 'top' ? -offset : offset),
-          null,
-          this.flip,
-          boundary).
-          target;
+          const [scrollElement] = uikitUtil.scrollParents(element, /auto|scroll/);
+          const { scrollTop, scrollLeft } = scrollElement;
 
-          this.dir = axis === 'x' ? x : y;
-          this.align = axis === 'x' ? y : x;
+          // Ensure none positioned element does not generate scrollbars
+          const elDim = uikitUtil.dimensions(element);
+          uikitUtil.css(element, { top: -elDim.height, left: -elDim.width });
 
-          uikitUtil.toggleClass(element, this.clsPos + "-" + this.dir + "-" + this.align, this.offset === false);
+          uikitUtil.positionAt(element, target, {
+            attach,
+            offset,
+            boundary,
+            placement,
+            viewportOffset: this.getViewportOffset(element) });
+
+
+          // Restore scroll position
+          scrollElement.scrollTop = scrollTop;
+          scrollElement.scrollLeft = scrollLeft;
         },
 
-        getAxis() {
-          return this.dir === 'top' || this.dir === 'bottom' ? 'y' : 'x';
+        getPositionOffset(element) {
+          return (
+            uikitUtil.toPx(
+            this.offset === false ? uikitUtil.css(element, '--uk-position-offset') : this.offset,
+            this.axis === 'x' ? 'width' : 'height',
+            element) * (
+
+            uikitUtil.includes(['left', 'top'], this.dir) ? -1 : 1) * (
+            this.inset ? -1 : 1));
+
+        },
+
+        getShiftOffset(element) {
+          return this.align === 'center' ?
+          0 :
+          uikitUtil.toPx(
+          uikitUtil.css(element, '--uk-position-shift-offset'),
+          this.axis === 'y' ? 'width' : 'height',
+          element) * (
+          uikitUtil.includes(['left', 'top'], this.align) ? 1 : -1);
+        },
+
+        getViewportOffset(element) {
+          return uikitUtil.toPx(uikitUtil.css(element, '--uk-position-viewport-offset'));
         } } };
 
     var Component = {
@@ -291,8 +364,7 @@
         delay: 0,
         animation: ['uk-animation-scale-up'],
         duration: 100,
-        cls: 'uk-active',
-        clsPos: 'uk-tooltip' },
+        cls: 'uk-active' },
 
 
       beforeConnect() {
@@ -347,9 +419,9 @@
 
         _show() {
           this.tooltip = uikitUtil.append(
-          this.container, "<div class=\"" +
-          this.clsPos + "\"> <div class=\"" +
-          this.clsPos + "-inner\">" + this.title + "</div> </div>");
+          this.container, "<div class=\"uk-" +
+          this.$options.name + "\"> <div class=\"uk-" +
+          this.$options.name + "-inner\">" + this.title + "</div> </div>");
 
 
 
@@ -362,10 +434,12 @@
 
             this.positionAt(this.tooltip, this.$el);
 
+            const [dir, align] = getAlignment(this.tooltip, this.$el, this.pos);
+
             this.origin =
-            this.getAxis() === 'y' ?
-            uikitUtil.flipPosition(this.dir) + "-" + this.align :
-            this.align + "-" + uikitUtil.flipPosition(this.dir);
+            this.axis === 'y' ?
+            uikitUtil.flipPosition(dir) + "-" + align :
+            align + "-" + uikitUtil.flipPosition(dir);
           });
 
           this.toggleElement(this.tooltip, true);
@@ -400,6 +474,37 @@
       if (!uikitUtil.isFocusable(el)) {
         uikitUtil.attr(el, 'tabindex', '0');
       }
+    }
+
+    function getAlignment(el, target, _ref) {let [dir, align] = _ref;
+      const elOffset = uikitUtil.offset(el);
+      const targetOffset = uikitUtil.offset(target);
+      const properties = [
+      ['left', 'right'],
+      ['top', 'bottom']];
+
+
+      for (const props of properties) {
+        if (elOffset[props[0]] >= targetOffset[props[1]]) {
+          dir = props[1];
+          break;
+        }
+        if (elOffset[props[1]] <= targetOffset[props[0]]) {
+          dir = props[0];
+          break;
+        }
+      }
+
+      const props = uikitUtil.includes(properties[0], dir) ? properties[1] : properties[0];
+      if (elOffset[props[0]] === targetOffset[props[0]]) {
+        align = props[0];
+      } else if (elOffset[props[1]] === targetOffset[props[1]]) {
+        align = props[1];
+      } else {
+        align = 'center';
+      }
+
+      return [dir, align];
     }
 
     if (typeof window !== 'undefined' && window.UIkit) {

@@ -2,6 +2,9 @@ import SVG from './svg';
 import closeIcon from '../../images/components/close-icon.svg';
 import closeLarge from '../../images/components/close-large.svg';
 import marker from '../../images/components/marker.svg';
+import navParentIcon from '../../images/components/nav-parent-icon.svg';
+import navParentIconLarge from '../../images/components/nav-parent-icon-large.svg';
+import navbarParentIcon from '../../images/components/navbar-parent-icon.svg';
 import navbarToggleIcon from '../../images/components/navbar-toggle-icon.svg';
 import overlayIcon from '../../images/components/overlay-icon.svg';
 import paginationNext from '../../images/components/pagination-next.svg';
@@ -19,6 +22,7 @@ import {
     $,
     addClass,
     apply,
+    closest,
     css,
     each,
     hasClass,
@@ -35,6 +39,9 @@ const icons = {
     marker,
     'close-icon': closeIcon,
     'close-large': closeLarge,
+    'nav-parent-icon': navParentIcon,
+    'nav-parent-icon-large': navParentIconLarge,
+    'navbar-parent-icon': navbarParentIcon,
     'navbar-toggle-icon': navbarToggleIcon,
     'overlay-icon': overlayIcon,
     'pagination-next': paginationNext,
@@ -96,41 +103,43 @@ export const IconComponent = {
     },
 };
 
+export const NavParentIcon = {
+    extends: IconComponent,
+
+    beforeConnect() {
+        const icon = this.$props.icon;
+        this.icon = closest(this.$el, '.uk-nav-primary') ? `${icon}-large` : icon;
+    },
+};
+
 export const Slidenav = {
     extends: IconComponent,
 
     beforeConnect() {
         addClass(this.$el, 'uk-slidenav');
-    },
-
-    computed: {
-        icon({ icon }, $el) {
-            return hasClass($el, 'uk-slidenav-large') ? `${icon}-large` : icon;
-        },
+        const icon = this.$props.icon;
+        this.icon = hasClass(this.$el, 'uk-slidenav-large') ? `${icon}-large` : icon;
     },
 };
 
 export const Search = {
     extends: IconComponent,
 
-    computed: {
-        icon({ icon }, $el) {
-            return hasClass($el, 'uk-search-icon') && parents($el, '.uk-search-large').length
+    beforeConnect() {
+        this.icon =
+            hasClass(this.$el, 'uk-search-icon') && parents(this.$el, '.uk-search-large').length
                 ? 'search-large'
-                : parents($el, '.uk-search-navbar').length
+                : parents(this.$el, '.uk-search-navbar').length
                 ? 'search-navbar'
-                : icon;
-        },
+                : this.$props.icon;
     },
 };
 
 export const Close = {
     extends: IconComponent,
 
-    computed: {
-        icon() {
-            return `close-${hasClass(this.$el, 'uk-close-large') ? 'large' : 'icon'}`;
-        },
+    beforeConnect() {
+        this.icon = `close-${hasClass(this.$el, 'uk-close-large') ? 'large' : 'icon'}`;
     },
 };
 

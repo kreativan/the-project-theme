@@ -1,4 +1,4 @@
-/*! UIkit 3.12.2 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
+/*! UIkit 3.15.1 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('uikit-util')) :
@@ -98,6 +98,8 @@
 
       methods: {
         async upload(files) {
+          files = uikitUtil.toArray(files);
+
           if (!files.length) {
             return;
           }
@@ -184,7 +186,6 @@
     }
 
     function chunk(files, size) {
-      files = uikitUtil.toArray(files);
       const chunks = [];
       for (let i = 0; i < files.length; i += size) {
         chunks.push(files.slice(i, i + size));

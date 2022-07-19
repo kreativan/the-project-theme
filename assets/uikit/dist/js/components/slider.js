@@ -1,4 +1,4 @@
-/*! UIkit 3.12.2 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
+/*! UIkit 3.15.1 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('uikit-util')) :
@@ -9,6 +9,15 @@
     var Class = {
       connected() {
         !uikitUtil.hasClass(this.$el, this.$name) && uikitUtil.addClass(this.$el, this.$name);
+      } };
+
+    var Resize = {
+      connected() {var _this$$options$resize;
+        this.registerObserver(
+        uikitUtil.observeResize(((_this$$options$resize = this.$options.resizeTargets) == null ? void 0 : _this$$options$resize.call(this)) || this.$el, () =>
+        this.$emit('resize')));
+
+
       } };
 
     var SliderAutoplay = {
@@ -76,6 +85,11 @@
           this.interval && clearInterval(this.interval);
         } } };
 
+    const pointerOptions = { passive: false, capture: true };
+    const pointerDown = 'touchstart mousedown';
+    const pointerMove = 'touchmove mousemove';
+    const pointerUp = 'touchend touchcancel mouseup click input';
+
     var SliderDrag = {
       props: {
         draggable: Boolean },
@@ -102,7 +116,7 @@
 
       events: [
       {
-        name: uikitUtil.pointerDown,
+        name: pointerDown,
 
         delegate() {
           return this.selSlides;
@@ -128,7 +142,17 @@
 
         handler(e) {
           e.preventDefault();
-        } }],
+        } },
+
+
+      {
+        // iOS workaround for slider stopping if swiping fast
+        name: pointerMove + " " + pointerUp,
+        el() {
+          return this.list;
+        },
+        handler: uikitUtil.noop,
+        ...pointerOptions }],
 
 
 
@@ -150,10 +174,10 @@
             this.prevIndex = this.index;
           }
 
-          uikitUtil.on(document, uikitUtil.pointerMove, this.move, { passive: false });
+          uikitUtil.on(document, pointerMove, this.move, pointerOptions);
 
           // 'input' event is triggered by video controls
-          uikitUtil.on(document, uikitUtil.pointerUp + " " + uikitUtil.pointerCancel + " input", this.end, true);
+          uikitUtil.on(document, pointerUp, this.end, pointerOptions);
 
           uikitUtil.css(this.list, 'userSelect', 'none');
         },
@@ -233,8 +257,8 @@
         },
 
         end() {
-          uikitUtil.off(document, uikitUtil.pointerMove, this.move, { passive: false });
-          uikitUtil.off(document, uikitUtil.pointerUp + " " + uikitUtil.pointerCancel + " input", this.end, true);
+          uikitUtil.off(document, pointerMove, this.move, pointerOptions);
+          uikitUtil.off(document, pointerUp, this.end, pointerOptions);
 
           if (this.dragging) {
             this.dragging = null;
@@ -349,7 +373,7 @@
         } } };
 
     var Slider = {
-      mixins: [SliderAutoplay, SliderDrag, SliderNav],
+      mixins: [SliderAutoplay, SliderDrag, SliderNav, Resize],
 
       props: {
         clsActivated: Boolean,
@@ -569,13 +593,20 @@
         events: ['resize'] } };
 
     var Lazyload = {
+      data: {
+        preload: 5 },
+
+
       methods: {
         lazyload(observeTargets, targets) {if (observeTargets === void 0) {observeTargets = this.$el;}if (targets === void 0) {targets = this.$el;}
           this.registerObserver(
           uikitUtil.observeIntersection(observeTargets, (entries, observer) => {
             for (const el of uikitUtil.toNodes(uikitUtil.isFunction(targets) ? targets() : targets)) {
-              uikitUtil.$$('[loading="lazy"]', el).forEach((el) => uikitUtil.removeAttr(el, 'loading'));
+              uikitUtil.$$('[loading="lazy"]', el).
+              slice(0, this.preload - 1).
+              forEach((el) => uikitUtil.removeAttr(el, 'loading'));
             }
+
             for (const el of entries.
             filter((_ref) => {let { isIntersecting } = _ref;return isIntersecting;}).
             map((_ref2) => {let { target } = _ref2;return target;})) {
@@ -789,7 +820,7 @@
           return (
             finite ||
             Math.ceil(getWidth(this.list)) <
-            Math.floor(uikitUtil.dimensions(this.list).width + getMaxElWidth(this.list) + this.center));
+            Math.trunc(uikitUtil.dimensions(this.list).width + getMaxElWidth(this.list) + this.center));
 
         },
 
@@ -823,7 +854,7 @@
           let left = 0;
           const sets = [];
           const width = uikitUtil.dimensions(this.list).width;
-          for (let i in this.slides) {
+          for (let i = 0; i < this.slides.length; i++) {
             const slideWidth = uikitUtil.dimensions(this.slides[i]).width;
 
             if (left + slideWidth > width) {

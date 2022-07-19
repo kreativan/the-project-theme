@@ -36,6 +36,7 @@ $class .= $container ? " uk-section{$section}" : " uk-margin{$margin}";
     <?php
       if($container) echo "<div class='uk-container'>";
       get_template_part("blocks/$layout");
+      wp_reset_postdata();
       if($container) echo "</div>";
     ?>
   </div>

@@ -11,15 +11,23 @@
   <?php
   foreach(get_field('content') as $item) {
     if($item['acf_fc_layout'] == "editor") {
+
       echo $item['editor'];
+
     } if($item['acf_fc_layout'] == "markdown") {
+
       markdown($item['text']);
+
     } if($item['acf_fc_layout'] == "code") {
+
+      $code = htmlspecialchars($item['code']);
+
       if(!empty($item['title'])) echo "<h3>{$item['title']}</h3>";
       if(!empty($item['text'])) markdown($item['text']);
       echo "<pre class='uk-border-rounded'>";
-      echo "<code class='language-{$item['lang']}'>{$item['code']}</code>";
+      echo "<code class='language-{$item['lang']}'>{$code}</code>";
       echo "</pre>";
+
     }
   }
   ?>

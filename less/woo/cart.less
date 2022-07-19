@@ -1,0 +1,142 @@
+/* =========================================================== 
+  WooCommerce: Cart
+=========================================================== */
+
+.woocommerce-cart-form {
+
+  .shop_table th {
+    border-bottom: 1px solid @global-border;
+    border-top: 1px solid @global-border;
+    background: white;
+    text-align:left;
+  }
+
+  td.product-subtotal,
+  th.product-subtotal {
+    text-align: right;
+  }
+
+  td.product-quantity .screen-reader-text {
+    display: none;
+  }
+
+  td.product-thumbnail {
+    width: 100px;
+  }
+
+  .product-remove {
+    .uk-table-shrink();
+  }
+
+  .product-remove a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height:22px;
+    border-radius: 50%;
+    background: @global-danger-background;
+    color: white;
+    font-size: 18px;
+    position:relative;
+    &:hover {
+      text-decoration: none;
+      background: darken(@global-danger-background, 10%);
+    }
+  }
+
+  .product-thumbnail img {
+    max-width:80px;
+  }
+
+  .actions {
+    
+    padding: 0;
+    background: white;
+    border-top: 1px solid @global-border;
+
+    button {
+
+      .uk-button-primary();
+      .uk-float-right();
+      .uk-width-1-5();
+  
+      margin: @global-small-gutter;
+
+      &:active,
+      &:focus,
+      &:hover {
+        background: @button-primary-hover-background;
+        color: white;
+      }
+    }
+
+  }
+
+  .coupon {
+    background: @global-muted-background;
+    border-bottom: 1px solid @global-border;
+    display: flex;
+    padding: @global-small-gutter;
+    label {display: none;}
+    input {
+      .uk-width-expand();
+    }
+    button {
+      .uk-button-default();
+      background: white;
+      border:1px solid @global-border;
+      margin: 0 0 0 @global-margin;
+      .uk-width-1-5();
+    }
+  }
+
+
+}
+
+.cart_totals {
+
+  margin-top: @global-margin;
+
+  .shop_table {
+    border:none;
+  }
+
+  tr {
+    border: none !important;
+  }
+
+  th {
+    .uk-width-expand();
+    text-align: left;
+    padding-left: @global-small-gutter;
+  }
+
+  .shop_table td {
+    text-align: right;
+  }
+
+  #shipping_method {
+    .uk-list(); 
+    margin:0;
+  }
+
+  .woocommerce-shipping-destination {
+    margin: 0;
+  }
+
+  .order-total {
+    .amount {
+      font-size:1.2rem;
+    }
+  }
+
+  .wc-proceed-to-checkout {
+    text-align: right;
+    .button {
+      margin-top: @global-margin;
+      .uk-button-primary();
+    }
+  }
+
+}

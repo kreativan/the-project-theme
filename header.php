@@ -1,4 +1,5 @@
 <?php
+
 // Site language
 $lang = get_option('WPLANG');
 $lang = explode("_", $lang);
@@ -31,6 +32,7 @@ $js_files = [
   get_template_directory_uri() . "/assets/uikit/dist/js/uikit-core.min.js",
   get_template_directory_uri() . "/assets/uikit/dist/js/uikit-icons.min.js",
   get_template_directory_uri() . "/assets/uikit/dist/js/components/notification.min.js",
+  get_template_directory_uri() . "/assets/uikit/dist/js/components/slideshow.min.js",
 ];
 
 // js vars
@@ -49,6 +51,11 @@ $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https"
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="<?= $google_fonts_link ?>">
+  <link href="<?= $google_fonts_link ?>" rel="stylesheet"> 
 
   <!-- preload -->
   <?php if(!$dev_mode) :?>
@@ -69,11 +76,6 @@ $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https"
     const cms = <?= json_encode($js_vars) ?>;
     console.log(cms);
   </script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="<?= $google_fonts_link ?>">
-  <link href="<?= $google_fonts_link ?>" rel="stylesheet"> 
 
 </head>
 
@@ -146,5 +148,19 @@ uk-sticky="show-on-up: true; animation: uk-animation-slide-top">
     </nav>
   </div>
 </header>
+
+<?php if( (is_woocommerce() || is_product_category() || is_product_tag() || is_product() || is_cart() || is_checkout() || is_account_page()) && has_nav_menu('footer-menu')) :?>
+<div id="shop-menu" class="uk-background-muted uk-padding-small">
+  <div class="uk-container">
+  <?php
+    wp_nav_menu([
+      'theme_location' => 'shop-menu',
+      'menu_class' => 'uk-subnav uk-subnav-divider uk-flex-center uk-margin-remove-bottom',
+      'depth' => 1,
+    ]);
+  ?>
+  </div>
+</div>
+<?php endif; ?>
 
 <main id="main"><!-- main start -->

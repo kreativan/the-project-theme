@@ -1,0 +1,111 @@
+/* =========================================================== 
+  WooCommerce: Checkout
+=========================================================== */
+
+.woocommerce-checkout {
+
+  label {
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  abbr.required {
+    color: @global-danger-background;
+    text-decoration: none;
+  }
+
+  #customer_details > div {
+    background: @global-muted-background;
+    padding: @global-gutter;
+    & + div {
+      margin-top: @global-margin;
+    }
+  }
+
+  @media(min-width: @breakpoint-large) {
+
+    .woocommerce-shipping-fields__field-wrapper,
+    .woocommerce-billing-fields__field-wrapper {
+
+      display: flex;
+      flex-wrap: wrap;
+
+      & > p {
+        width: 100%;
+        margin: 0;
+        margin-bottom: @global-margin;
+      }
+
+      .form-row {
+        width: 49%;
+      }
+
+      .form-row-last {
+        margin-left: 2%;
+      }
+
+      .form-row-wide {
+        width: 100%;
+      }
+
+    }
+  }
+
+  th {
+    text-align: left;
+    padding-left: @global-small-gutter;
+  }
+
+  #shipping_method {
+    .uk-list();
+  }
+
+
+}
+
+.checkout_coupon {
+  
+  background: @global-muted-background;
+  padding: @global-gutter;
+  margin-bottom: @global-margin;
+
+  .form-row-last {
+    margin-bottom:0;
+  }
+
+  .button {
+    background: white;
+    border: 1px solid @global-border;
+  }
+
+}
+
+.woocommerce-checkout-payment {
+
+  margin-top: @global-margin;
+
+  .wc_payment_methods {
+    .uk-list();
+    background: @global-muted-background;
+    padding: @global-gutter;
+  }
+
+}
+
+.woocommerce-terms-and-conditions-wrapper {
+
+  margin: @global-margin 0;
+  font-size: 0.85rem;
+
+}
+
+.button[name=woocommerce_checkout_place_order] {
+  .uk-button-primary();
+  .uk-button-large();
+  &:hover,
+  &:focus,
+  &:active  {
+    background: @button-primary-hover-background;
+    color: @button-primary-hover-color;
+  }
+}

@@ -47,7 +47,14 @@
   Subnav
 =========================================================== */
 
-.hook-subnav() {}
+.hook-subnav() {
+
+  li.current-menu-item a {
+    color: @subnav-item-active-color;
+  }
+
+}
+
 .hook-subnav-item() {}
 .hook-subnav-item-hover() {}
 .hook-subnav-item-active() {}

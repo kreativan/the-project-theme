@@ -14,7 +14,7 @@ $headline = isset($_REQUEST["headline"]) ? $_REQUEST["headline"] : "";
 
   <a href="#"
     class="uk-text-danger" 
-    hx-post="/htmx/blank/"
+    hx-post="/ajax/htmx/blank/"
     hx-target="#target"
     hx-swap="innerHTML"
   >

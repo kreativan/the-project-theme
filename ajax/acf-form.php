@@ -70,14 +70,14 @@ if (!empty($_POST['form_id'])) {
   //-------------------------------------------------------- 
   //  Validate
   //-------------------------------------------------------- 
-
+  
   $v = the_project_valitron($_POST);
   $v->rule('required', $req_array); 
   $v->rule('email', $email_array);
   $v->labels($labels_array);
 
   $files_errors = ($is_files && ($files_count < $req_files_count)) ? true : false;
-
+  
   if(!$v->validate() || $files_errors || !$captcha) {
 
     // get errors from valitron and store them in errors array
@@ -88,7 +88,7 @@ if (!empty($_POST['form_id'])) {
       $errors_fields[] = $key;
     }
 
-    if(!$captcha) $errors[] = lng('Wrong Captcha');
+    //if(!$captcha) $errors[] = lng('Wrong Captcha');
 
     // trigger files errors
     if($files_errors) {

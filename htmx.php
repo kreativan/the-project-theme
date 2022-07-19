@@ -21,7 +21,7 @@ $htmx_req = [
       <?= the_content() ?>
     
       <button type="button" class="uk-button uk-button-primary"
-        hx-post="/htmx/test/"
+        hx-post="/ajax/htmx/test/"
         hx-target="#target"
         hx-swap="outerHTML"
         hx-vals='<?= json_encode($htmx_req) ?>'

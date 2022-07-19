@@ -4,9 +4,12 @@
 
 table:not(.uk-table) {
 
+  width: 100%;
   border-color: @global-border;
   border: none;
+  border-collapse: collapse;
   font-size: 0.95rem;
+  border: 1px solid @global-border;
 
   td {
     padding: 10px 15px;
@@ -16,5 +19,27 @@ table:not(.uk-table) {
   tr:nth-child(odd) {
     background: @global-muted-background;
   }
+
+  tr + tr {
+    border-top: 1px solid @global-border;
+  }
+
+  thead th {
+    padding: 10px 15px;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: @global-muted-color;
+    background: white;
+  }  
   
+  tfoot {
+    border-top: 1px solid @global-border;
+  }
+
+  ul {
+    margin: 0;
+  }
+
 }

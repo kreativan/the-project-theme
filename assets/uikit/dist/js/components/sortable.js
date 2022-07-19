@@ -1,4 +1,4 @@
-/*! UIkit 3.12.2 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
+/*! UIkit 3.15.1 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('uikit-util')) :
@@ -649,7 +649,7 @@
       let last = Date.now();
       trackTimer = setInterval(() => {
         let { x, y } = pos;
-        y += uikitUtil.scrollTop(window);
+        y += document.scrollingElement.scrollTop;
 
         const dist = (Date.now() - last) * 0.3;
         last = Date.now();
@@ -659,7 +659,7 @@
         some((scrollEl) => {
           let { scrollTop: scroll, scrollHeight } = scrollEl;
 
-          const { top, bottom, height } = uikitUtil.offset(uikitUtil.getViewport(scrollEl));
+          const { top, bottom, height } = uikitUtil.offsetViewport(scrollEl);
 
           if (top < y && top + 35 > y) {
             scroll -= dist;
@@ -670,7 +670,7 @@
           }
 
           if (scroll > 0 && scroll < scrollHeight - height) {
-            uikitUtil.scrollTop(scrollEl, scroll);
+            scrollEl.scrollTop = scroll;
             return true;
           }
         });

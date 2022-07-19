@@ -13,6 +13,7 @@ import {
     hasClass,
     matches,
     queryAll,
+    ready,
     toggleClass,
     toNodes,
     within,
@@ -47,13 +48,14 @@ export default {
 
             watch(connects) {
                 if (this.swiping) {
-                    css(connects, 'touch-action', 'pan-y pinch-zoom');
+                    css(connects, 'touchAction', 'pan-y pinch-zoom');
                 }
 
                 const index = this.index();
-                this.connects.forEach((el) =>
-                    children(el).forEach((child, i) => toggleClass(child, this.cls, i === index))
-                );
+                this.connects.forEach((el) => {
+                    children(el).forEach((child, i) => toggleClass(child, this.cls, i === index));
+                    this.lazyload(this.$el, children(el));
+                });
             },
 
             immediate: true,
@@ -86,7 +88,8 @@ export default {
     },
 
     connected() {
-        this.lazyload(this.$el, this.connects);
+        // check for connects
+        ready(() => this.$emit());
     },
 
     events: [
@@ -144,27 +147,21 @@ export default {
 
         show(item) {
             const prev = this.index();
-            const next = getIndex(
-                this.children[getIndex(item, this.toggles, prev)],
-                children(this.$el)
-            );
-
-            if (prev === next) {
-                return;
-            }
-
-            this.children.forEach((child, i) => {
-                toggleClass(child, this.cls, next === i);
-                attr(this.toggles[i], 'aria-expanded', next === i);
+            const next = getIndex(item, this.toggles, prev);
+            const active = getIndex(this.children[next], children(this.$el));
+            children(this.$el).forEach((child, i) => {
+                toggleClass(child, this.cls, active === i);
+                attr(this.toggles[i], 'aria-expanded', active === i);
             });
 
+            const animate = prev >= 0 && prev !== next;
             this.connects.forEach(async ({ children }) => {
                 await this.toggleElement(
                     toNodes(children).filter((child) => hasClass(child, this.cls)),
                     false,
-                    prev >= 0
+                    animate
                 );
-                await this.toggleElement(children[next], true, prev >= 0);
+                await this.toggleElement(children[active], true, animate);
             });
         },
     },

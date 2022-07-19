@@ -16,6 +16,7 @@ import {
     pointerEnter,
     pointerLeave,
     queryAll,
+    ready,
     trigger,
     within,
 } from 'uikit-util';
@@ -41,13 +42,6 @@ export default {
         queued: true,
     },
 
-    connected() {
-        if (!includes(this.mode, 'media') && !isFocusable(this.$el)) {
-            attr(this.$el, 'tabindex', '0');
-        }
-        this.lazyload(this.$el, this.target);
-    },
-
     computed: {
         target: {
             get({ href, target }, $el) {
@@ -57,10 +51,20 @@ export default {
 
             watch() {
                 this.updateAria();
+                this.lazyload(this.$el, this.target);
             },
 
             immediate: true,
         },
+    },
+
+    connected() {
+        if (!includes(this.mode, 'media') && !isFocusable(this.$el)) {
+            attr(this.$el, 'tabindex', '0');
+        }
+
+        // check for target
+        ready(() => this.$emit());
     },
 
     events: [
@@ -72,6 +76,8 @@ export default {
             },
 
             handler(e) {
+                this._preventClick = null;
+
                 if (!isTouch(e) || this._showState) {
                     return;
                 }
@@ -119,7 +125,7 @@ export default {
                 }
 
                 // Skip if state does not change e.g. hover + focus received
-                if (this._showState && show === (expanded !== this._showState)) {
+                if (this._showState && show && expanded !== this._showState) {
                     // Ensure reset if state has changed through click
                     if (!show) {
                         this._showState = null;
@@ -152,16 +158,13 @@ export default {
             name: 'click',
 
             filter() {
-                return includes(this.mode, 'click');
+                return ['click', 'hover'].some((mode) => includes(this.mode, mode));
             },
 
             handler(e) {
-                if (this._preventClick) {
-                    return (this._preventClick = null);
-                }
-
                 let link;
                 if (
+                    this._preventClick ||
                     closest(e.target, 'a[href="#"], a[href=""]') ||
                     ((link = closest(e.target, 'a[href]')) &&
                         (attr(this.$el, 'aria-expanded') !== 'true' ||
@@ -170,12 +173,14 @@ export default {
                     e.preventDefault();
                 }
 
-                this.toggle();
+                if (!this._preventClick && includes(this.mode, 'click')) {
+                    this.toggle();
+                }
             },
         },
 
         {
-            name: 'toggled',
+            name: 'hide show',
 
             self: true,
 
@@ -183,28 +188,29 @@ export default {
                 return this.target;
             },
 
-            handler(e, toggled) {
-                if (e.target === this.target[0]) {
-                    this.updateAria(toggled);
+            handler({ type }) {
+                this.updateAria(type === 'show');
+            },
+        },
+
+        {
+            name: 'mediachange',
+
+            filter() {
+                return includes(this.mode, 'media');
+            },
+
+            el() {
+                return this.target;
+            },
+
+            handler(e, mediaObj) {
+                if (mediaObj.matches ^ this.isToggled(this.target)) {
+                    this.toggle();
                 }
             },
         },
     ],
-
-    update: {
-        read() {
-            return includes(this.mode, 'media') && this.media ? { match: this.matchMedia } : false;
-        },
-
-        write({ match }) {
-            const toggled = this.isToggled(this.target);
-            if (match ? !toggled : toggled) {
-                this.toggle();
-            }
-        },
-
-        events: ['resize'],
-    },
 
     methods: {
         async toggle(type) {

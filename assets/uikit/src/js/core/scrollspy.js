@@ -1,18 +1,22 @@
+import Scroll from '../mixin/scroll';
 import {
     $$,
     css,
     filter,
     data as getData,
-    isInView,
+    isEqual,
+    observeIntersection,
     once,
     removeClass,
     removeClasses,
     toggleClass,
+    toPx,
     trigger,
 } from 'uikit-util';
 
-const stateKey = '_ukScrollspy';
 export default {
+    mixins: [Scroll],
+
     args: 'cls',
 
     props: {
@@ -42,9 +46,13 @@ export default {
                 return target ? $$(target, $el) : [$el];
             },
 
-            watch(elements) {
+            watch(elements, prev) {
                 if (this.hidden) {
                     css(filter(elements, `:not(.${this.inViewClass})`), 'visibility', 'hidden');
+                }
+
+                if (!isEqual(elements, prev)) {
+                    this.$reset();
                 }
             },
 
@@ -52,38 +60,50 @@ export default {
         },
     },
 
+    connected() {
+        this._data.elements = new Map();
+        this.registerObserver(
+            observeIntersection(
+                this.elements,
+                (records) => {
+                    const elements = this._data.elements;
+                    for (const { target: el, isIntersecting } of records) {
+                        if (!elements.has(el)) {
+                            elements.set(el, {
+                                cls: getData(el, 'uk-scrollspy-class') || this.cls,
+                            });
+                        }
+
+                        const state = elements.get(el);
+                        if (!this.repeat && state.show) {
+                            continue;
+                        }
+
+                        state.show = isIntersecting;
+                    }
+
+                    this.$emit();
+                },
+                {
+                    rootMargin: `${toPx(this.offsetTop, 'height') - 1}px ${
+                        toPx(this.offsetLeft, 'width') - 1
+                    }px`,
+                },
+                false
+            )
+        );
+    },
+
     disconnected() {
-        for (const el of this.elements) {
-            removeClass(el, this.inViewClass, el[stateKey] ? el[stateKey].cls : '');
-            delete el[stateKey];
+        for (const [el, state] of this._data.elements.entries()) {
+            removeClass(el, this.inViewClass, state?.cls || '');
         }
     },
 
     update: [
         {
-            read(data) {
-                // Let child components be applied at least once first
-                if (!data.update) {
-                    Promise.resolve().then(() => {
-                        this.$emit();
-                        data.update = true;
-                    });
-                    return false;
-                }
-
-                for (const el of this.elements) {
-                    if (!el[stateKey]) {
-                        el[stateKey] = { cls: getData(el, 'uk-scrollspy-class') || this.cls };
-                    }
-
-                    el[stateKey].show = isInView(el, this.offsetTop, this.offsetLeft);
-                }
-            },
-
             write(data) {
-                for (const el of this.elements) {
-                    const state = el[stateKey];
-
+                for (const [el, state] of data.elements.entries()) {
                     if (state.show && !state.inview && !state.queued) {
                         state.queued = true;
 
@@ -101,16 +121,18 @@ export default {
                     }
                 }
             },
-
-            events: ['scroll', 'resize'],
         },
     ],
 
     methods: {
         toggle(el, inview) {
-            const state = el[stateKey];
+            const state = this._data.elements.get(el);
 
-            state.off && state.off();
+            if (!state) {
+                return;
+            }
+
+            state.off?.();
 
             css(el, 'visibility', !inview && this.hidden ? 'hidden' : '');
 
@@ -118,9 +140,12 @@ export default {
             toggleClass(el, state.cls);
 
             if (/\buk-animation-/.test(state.cls)) {
-                state.off = once(el, 'animationcancel animationend', () =>
-                    removeClasses(el, 'uk-animation-[\\w-]+')
-                );
+                const removeAnimationClasses = () => removeClasses(el, 'uk-animation-[\\w-]+');
+                if (inview) {
+                    state.off = once(el, 'animationcancel animationend', removeAnimationClasses);
+                } else {
+                    removeAnimationClasses();
+                }
             }
 
             trigger(el, inview ? 'inview' : 'outview');

@@ -1,10 +1,11 @@
 import Class from '../mixin/class';
 import Lazyload from '../mixin/lazyload';
-import { default as Togglable, toggleHeight } from '../mixin/togglable';
+import { default as Togglable, toggleTransition } from '../mixin/togglable';
 import {
     $,
     $$,
     attr,
+    fastdom,
     filter,
     getIndex,
     hasClass,
@@ -13,34 +14,32 @@ import {
     isInView,
     scrollIntoView,
     toggleClass,
-    unwrap,
-    wrapAll,
+    within,
 } from 'uikit-util';
 
 export default {
     mixins: [Class, Lazyload, Togglable],
 
     props: {
+        animation: Boolean,
         targets: String,
         active: null,
         collapsible: Boolean,
         multiple: Boolean,
         toggle: String,
         content: String,
-        transition: String,
         offset: Number,
     },
 
     data: {
         targets: '> *',
         active: false,
-        animation: [true],
+        animation: true,
         collapsible: true,
         multiple: false,
         clsOpen: 'uk-open',
         toggle: '> .uk-accordion-title',
         content: '> .uk-accordion-content',
-        transition: 'ease',
         offset: 0,
     },
 
@@ -51,8 +50,6 @@ export default {
             },
 
             watch(items, prev) {
-                items.forEach((el) => hide($(this.content, el), !hasClass(el, this.clsOpen)));
-
                 if (prev || hasClass(items, this.clsOpen)) {
                     return;
                 }
@@ -71,6 +68,26 @@ export default {
 
         toggles({ toggle }) {
             return this.items.map((item) => $(toggle, item));
+        },
+
+        contents: {
+            get({ content }) {
+                return this.items.map((item) => $(content, item));
+            },
+
+            watch(items) {
+                for (const el of items) {
+                    hide(
+                        el,
+                        !hasClass(
+                            this.items.find((item) => within(el, item)),
+                            this.clsOpen
+                        )
+                    );
+                }
+            },
+
+            immediate: true,
         },
     },
 
@@ -115,29 +132,23 @@ export default {
                     toggleClass(el, this.clsOpen, show);
                     attr($(this.$props.toggle, el), 'aria-expanded', show);
 
-                    const content = $(`${el._wrapper ? '> * ' : ''}${this.content}`, el);
+                    const content = $(this.content, el);
 
-                    if (animate === false || !this.hasTransition) {
+                    if (animate === false || !this.animation) {
+                        content.hidden = !show;
                         hide(content, !show);
                         return;
                     }
 
-                    if (!el._wrapper) {
-                        el._wrapper = wrapAll(content, `<div${show ? ' hidden' : ''}>`);
-                    }
-
-                    hide(content, false);
-                    await toggleHeight(this)(el._wrapper, show);
-                    hide(content, !show);
-
-                    delete el._wrapper;
-                    unwrap(content);
+                    await toggleTransition(this)(content, show);
 
                     if (show) {
                         const toggle = $(this.$props.toggle, el);
-                        if (!isInView(toggle)) {
-                            scrollIntoView(toggle, { offset: this.offset });
-                        }
+                        fastdom.read(() => {
+                            if (!isInView(toggle)) {
+                                scrollIntoView(toggle, { offset: this.offset });
+                            }
+                        });
                     }
                 });
             }

@@ -3,20 +3,22 @@ import {
     addClass,
     Animation,
     css,
-    fastdom,
+    dimensions,
     hasClass,
-    height,
     includes,
     isBoolean,
     isFunction,
     isVisible,
     noop,
     removeClass,
+    startsWith,
     toFloat,
     toggleClass,
     toNodes,
     Transition,
     trigger,
+    unwrap,
+    wrapInner,
 } from 'uikit-util';
 
 export default {
@@ -24,6 +26,7 @@ export default {
         cls: Boolean,
         animation: 'list',
         duration: Number,
+        velocity: Number,
         origin: String,
         transition: String,
     },
@@ -32,28 +35,11 @@ export default {
         cls: false,
         animation: [false],
         duration: 200,
+        velocity: 0.2,
         origin: false,
-        transition: 'linear',
+        transition: 'ease',
         clsEnter: 'uk-togglabe-enter',
         clsLeave: 'uk-togglabe-leave',
-
-        initProps: {
-            overflow: '',
-            height: '',
-            paddingTop: '',
-            paddingBottom: '',
-            marginTop: '',
-            marginBottom: '',
-        },
-
-        hideProps: {
-            overflow: 'hidden',
-            height: 0,
-            paddingTop: 0,
-            paddingBottom: 0,
-            marginTop: 0,
-            marginBottom: 0,
-        },
     },
 
     computed: {
@@ -62,7 +48,7 @@ export default {
         },
 
         hasTransition({ animation }) {
-            return this.hasAnimation && animation[0] === true;
+            return ['slide', 'reveal'].some((transition) => startsWith(animation[0], transition));
         },
     },
 
@@ -81,9 +67,9 @@ export default {
                             isFunction(animate)
                                 ? animate
                                 : animate === false || !this.hasAnimation
-                                ? this._toggle
+                                ? toggleInstant(this)
                                 : this.hasTransition
-                                ? toggleHeight(this)
+                                ? toggleTransition(this)
                                 : toggleAnimation(this)
                         )(el, show);
 
@@ -147,44 +133,115 @@ export default {
     },
 };
 
-export function toggleHeight({ isToggled, duration, initProps, hideProps, transition, _toggle }) {
+function toggleInstant({ _toggle }) {
     return (el, show) => {
-        const inProgress = Transition.inProgress(el);
-        const inner = el.hasChildNodes()
-            ? toFloat(css(el.firstElementChild, 'marginTop')) +
-              toFloat(css(el.lastElementChild, 'marginBottom'))
-            : 0;
-        const currentHeight = isVisible(el) ? height(el) + (inProgress ? 0 : inner) : 0;
-
+        Animation.cancel(el);
         Transition.cancel(el);
+        return _toggle(el, show);
+    };
+}
 
-        if (!isToggled(el)) {
+export function toggleTransition(cmp) {
+    const [mode = 'reveal', startProp = 'top'] = cmp.animation[0]?.split('-') || [];
+
+    const dirs = [
+        ['left', 'right'],
+        ['top', 'bottom'],
+    ];
+    const dir = dirs[includes(dirs[0], startProp) ? 0 : 1];
+    const end = dir[1] === startProp;
+    const props = ['width', 'height'];
+    const dimProp = props[dirs.indexOf(dir)];
+    const marginProp = `margin-${dir[0]}`;
+    const marginStartProp = `margin-${startProp}`;
+
+    return async (el, show) => {
+        let { duration, velocity, transition, _toggle } = cmp;
+
+        let currentDim = dimensions(el)[dimProp];
+
+        const inProgress = Transition.inProgress(el);
+        await Transition.cancel(el);
+
+        if (show) {
             _toggle(el, true);
         }
 
-        height(el, '');
+        const prevProps = Object.fromEntries(
+            [
+                'padding',
+                'border',
+                'width',
+                'height',
+                'overflowY',
+                'overflowX',
+                marginProp,
+                marginStartProp,
+            ].map((key) => [key, el.style[key]])
+        );
 
-        // Update child components first
-        fastdom.flush();
+        const dim = dimensions(el);
+        const currentMargin = toFloat(css(el, marginProp));
+        const marginStart = toFloat(css(el, marginStartProp));
+        const endDim = dim[dimProp] + marginStart;
 
-        const endHeight = height(el) + (inProgress ? 0 : inner);
-        height(el, currentHeight);
+        if (!inProgress && !show) {
+            currentDim += marginStart;
+        }
 
-        return (
-            show
-                ? Transition.start(
-                      el,
-                      { ...initProps, overflow: 'hidden', height: endHeight },
-                      Math.round(duration * (1 - currentHeight / endHeight)),
-                      transition
-                  )
-                : Transition.start(
-                      el,
-                      hideProps,
-                      Math.round(duration * (currentHeight / endHeight)),
-                      transition
-                  ).then(() => _toggle(el, false))
-        ).then(() => css(el, initProps));
+        const [wrapper] = wrapInner(el, '<div>');
+        css(wrapper, {
+            boxSizing: 'border-box',
+            height: dim.height,
+            width: dim.width,
+            ...css(el, [
+                'overflow',
+                'padding',
+                'borderTop',
+                'borderRight',
+                'borderBottom',
+                'borderLeft',
+                'borderImage',
+                marginStartProp,
+            ]),
+        });
+
+        css(el, {
+            padding: 0,
+            border: 0,
+            minWidth: 0,
+            minHeight: 0,
+            [marginStartProp]: 0,
+            width: dim.width,
+            height: dim.height,
+            overflow: 'hidden',
+            [dimProp]: currentDim,
+        });
+
+        const percent = currentDim / endDim;
+        duration = (velocity * endDim + duration) * (show ? 1 - percent : percent);
+        const endProps = { [dimProp]: show ? endDim : 0 };
+
+        if (end) {
+            css(el, marginProp, endDim - currentDim + currentMargin);
+            endProps[marginProp] = show ? currentMargin : endDim + currentMargin;
+        }
+
+        if (!end ^ (mode === 'reveal')) {
+            css(wrapper, marginProp, -endDim + currentDim);
+            Transition.start(wrapper, { [marginProp]: show ? 0 : -endDim }, duration, transition);
+        }
+
+        try {
+            await Transition.start(el, endProps, duration, transition);
+        } finally {
+            css(el, prevProps);
+            unwrap(wrapper.firstChild);
+
+            if (!show) {
+                _toggle(el, false);
+            }
+        }
     };
 }
 

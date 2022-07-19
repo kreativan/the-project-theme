@@ -1,4 +1,4 @@
-/*! UIkit 3.12.2 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
+/*! UIkit 3.15.1 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('uikit-util')) :
@@ -27,7 +27,7 @@
 
 
       connected() {
-        this.date = Date.parse(this.date);
+        this.date = Date.parse(this.$props.date);
         this.start();
       },
 
@@ -80,7 +80,7 @@
               continue;
             }
 
-            let digits = String(Math.floor(timespan[unit]));
+            let digits = String(Math.trunc(timespan[unit]));
 
             digits = digits.length < 2 ? "0" + digits : digits;
 

@@ -1,0 +1,69 @@
+/* =========================================================== 
+  WooCommerce
+=========================================================== */
+
+.woocommerce-pagination {
+
+  span,
+  a {
+    margin-top: 0; 
+    line-height:1;
+  }
+
+  .next {
+    align-items: center;
+  }
+
+}
+
+//  Forms
+// ===========================================================
+
+label:not(.uk-form-label):not(.uk-label) {
+  .uk-form-label();
+}
+
+.input-text {
+  .uk-input();
+  &.qty {
+    max-width: 80px;
+  }
+}
+
+//  Custom Slelect
+// ===========================================================
+
+.select2-container .select2-selection--single,
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  height: @global-control-height !important;
+  line-height: @global-control-height !important;
+}
+
+.select2-dropdown,
+.select2-container--default .select2-selection--single {
+  border-color: @form-border !important;
+  border-radius: 0 !important;
+}
+
+.select2-dropdown {
+  .uk-box-shadow-medium();
+}
+
+//  Button
+// ===========================================================
+
+input[type=submit]:not(.uk-button),
+.button:not(.uk-button) {
+
+  .uk-button();
+  .uk-button-default();
+
+  &:active, 
+  &:focus, 
+  &:hover {
+    cursor: pointer;
+    background-color: @button-default-hover-background;
+    color: @button-default-hover-color;
+  }
+
+}
