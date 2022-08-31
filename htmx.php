@@ -47,6 +47,11 @@
         Offcanvas
       </button>
 
+      <button class="uk-button uk-button-default" onclick="the_project.ajaxReq('/ajax/demo/')">
+        Ajax REQ
+      </button>
+
+      <span id="ajax-indicator" class="uk-hidden uk-margin-left" uk-spinner></span>
       <span id="htmx-indicator" class="htmx-indicator uk-margin-left" uk-spinner></span>
 
     </div>

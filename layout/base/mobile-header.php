@@ -7,7 +7,11 @@ $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https"
 
 <!-- mobile header -->
 <div id="mobile-menu" uk-offcanvas="overlay: true">
-  <div class="uk-offcanvas-bar uk-flex uk-flex-column"></div>
+  <div class="uk-offcanvas-bar uk-flex uk-flex-column">
+    <div class="uk-position-center uk-width-1-1 uk-text-center uk-flex-middle">
+      <span uk-spinner></span>
+    </div>
+  </div>
 </div>
 
 <div id="mobile-header" class="uk-hidden@l uk-flex uk-flex-center uk-flex-middle"

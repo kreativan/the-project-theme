@@ -7,7 +7,10 @@ $dev_mode = the_project('dev_mode') == '1' ? true : false;
 $assets_suffix = the_project('assets_suffix');
 
 // Less files
-$less_files = [get_template_directory() . "/less/import.less"];
+$less_files = [
+  get_template_directory() . "/less/import.less"
+];
+
 $less_vars = [
   "global-font-family" => "'Roboto Flex', sans-serif",
   "base-heading-font-family" => "'Roboto Flex', sans-serif",

@@ -29,7 +29,7 @@ function mobile_menu(actual_link = '') {
   let isLoaded = mobileMenu.querySelector("#mobile-menu-nav");
   UIkit.offcanvas(mobileMenu).show();
   if(!isLoaded) {
-    fetch(`/ajax/html/mobile-menu/?actual_link=${actual_link}`)
+    fetch(`/htmx/layout/menu/mobile-menu/?actual_link=${actual_link}`)
       .then(response => response.text())
       .then(data => {
         let mobileMenuBar = mobileMenu.querySelector(".uk-offcanvas-bar");
