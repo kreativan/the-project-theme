@@ -7,7 +7,7 @@
   </h1>
 
   <?php
-    get_template_part('includes/breadcrumb');
+    get_template_part('layout/common/breadcrumb');
   ?>
 
   <div class="uk-grid" uk-grid>
@@ -15,8 +15,8 @@
     <div class="uk-width-expand@m">
       <div id="content">
         <?php 
-          get_template_part('includes/archive'); 
-          get_template_part('includes/pagination');
+          get_template_part('layout/wp/archive'); 
+          get_template_part('layout/common/pagination');
         ?>
       </div>
     </div>

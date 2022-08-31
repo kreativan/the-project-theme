@@ -4,8 +4,7 @@
 
   <h1><?php the_title(); ?></h1>
 
-  <?php get_template_part('includes/blog-post'); ?>
-
+  <?php get_template_part('layout/wp/blog-post'); ?>
 
 </div>
 

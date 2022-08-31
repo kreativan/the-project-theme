@@ -2,11 +2,6 @@
 /** 
  *  Template Name: HTMX
  */ 
-
-$htmx_req = [
-  "headline" => "Headline",
-];
-
 ?>
 
 <?php get_header(); ?>
@@ -21,13 +16,38 @@ $htmx_req = [
       <?= the_content() ?>
     
       <button type="button" class="uk-button uk-button-primary"
-        hx-post="/ajax/htmx/test/"
+        hx-post="/htmx/layout/htmx-examples/test/"
         hx-target="#target"
         hx-swap="outerHTML"
-        hx-vals='<?= json_encode($htmx_req) ?>'
+        hx-indicator="#htmx-indicator"
+        hx-vals='<?= json_encode(["headline" => "Headline"]) ?>'
       >
         Load Content
       </button>
+
+      <button type="button" class="uk-button uk-button-default uk-margin-left tm-bg-white"
+        hx-get="/htmx/layout/htmx-examples/modal/"
+        hx-target="body"
+        hx-swap="beforeend"
+        hx-indicator="#htmx-indicator"
+        hx-vals='<?= json_encode(['title' => 'Modal']) ?>'
+        onclick="the_project.htmxModal()"
+      >
+        Modal
+      </button>
+
+      <button type="button" class="uk-button uk-button-default uk-margin-left tm-bg-white"
+        hx-get="/htmx/layout/htmx-examples/offcanvas/"
+        hx-target="body"
+        hx-swap="beforeend"
+        hx-indicator="#htmx-indicator"
+        hx-vals='<?= json_encode(['title' => 'Title']) ?>'
+        onclick="the_project.htmxOffcanvas()"
+      >
+        Offcanvas
+      </button>
+
+      <span id="htmx-indicator" class="htmx-indicator uk-margin-left" uk-spinner></span>
 
     </div>
 

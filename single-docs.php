@@ -2,7 +2,7 @@
 
 <div class="uk-container uk-container-small tm-container-margin">
 
-  <?php get_template_part('includes/breadcrumb'); ?>
+  <?php get_template_part('layout/common/breadcrumb'); ?>
 
   <h1><?php the_title(); ?></h1>
 

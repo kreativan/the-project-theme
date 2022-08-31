@@ -6,7 +6,7 @@
 
 <?php get_header(); ?>
 
-<?php get_template_part("includes/hero"); ?>
+<?php get_template_part("layout/home/hero"); ?>
 
 <div class="uk-container tm-container-margin">
 
@@ -15,7 +15,7 @@
   </div>
 
   <?php 
-    get_template_part('includes/page-builder');
+    get_template_part('layout/page-builder');
   ?>
 
 </div>

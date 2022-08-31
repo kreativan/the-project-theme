@@ -71,7 +71,7 @@ add_shortcode('hello', 'hello_shortcode');
 function katalog_feed($atts, $content = null, $tag = '') {
   ob_start();
   set_query_var("attributes", $atts);
-  get_template_part('katalog/katalog-feed');
+  get_template_part('layout/katalog/katalog-feed');
   return ob_get_clean();
 }
 add_shortcode('katalog', 'katalog_feed');
@@ -80,6 +80,15 @@ add_shortcode('katalog', 'katalog_feed');
 /* =========================================================== 
   WooCommerce
 =========================================================== */
+
+function remove_woocommerce_scripts() {
+  wp_dequeue_script('wc-cart-fragments');
+  wp_dequeue_script('woocommerce'); 
+  wp_dequeue_script('wc-add-to-cart');   
+  wp_deregister_script( 'js-cookie' );
+  wp_dequeue_script( 'js-cookie' );
+}
+// add_action( 'wp_enqueue_scripts', 'remove_woocommerce_scripts');
 
 
 /**

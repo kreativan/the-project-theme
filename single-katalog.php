@@ -56,7 +56,7 @@ $custom_fields = get_fields($post->ID);
         </ul>
         <?php the_content(); ?>
 
-        <?php get_template_part("includes/next-prev"); ?>
+        <?php get_template_part("layout/common/next-prev"); ?>
 
       </div>
     </div>

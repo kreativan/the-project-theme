@@ -15,19 +15,19 @@ $content = get_field('content', $page);
   <?= $content ?>
 
   <div class="uk-margin">
-    <?php get_template_part('katalog/katalog-nav'); ?>
+    <?php get_template_part('layout/katalog/katalog-nav'); ?>
   </div>
 
   <div class="uk-background-muted uk-padding uk-margin-medium">
-    <?php get_template_part('katalog/katalog-search-form'); ?>
+    <?php get_template_part('layout/katalog/katalog-search-form'); ?>
   </div>
 
   <?php
     if($_GET) {
-      get_template_part('katalog/katalog-search');
+      get_template_part('layout/katalog/katalog-search');
     } else {
-      get_template_part('katalog/katalog-grid');
-      get_template_part('includes/pagination');
+      get_template_part('layout/katalog/katalog-grid');
+      get_template_part('layout/common/pagination');
     }
   ?>
 

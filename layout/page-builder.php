@@ -1,7 +1,7 @@
 <?php
 /**
  *  Page Builder
- *  @example get_template_part('includes/page-builder', null, $args); 
+ *  @example get_template_part('layout/page-builder', null, $args); 
  *  @param string $container - true/false wrap block in a container
  *  @param string $space - space between blocks small/medium/large/xlarge
  *  
@@ -35,7 +35,7 @@ $class .= $container ? " uk-section{$section}" : " uk-margin{$margin}";
   <div class="<?= $class ?>">
     <?php
       if($container) echo "<div class='uk-container'>";
-      get_template_part("blocks/$layout");
+      get_template_part("layout/blocks/$layout");
       wp_reset_postdata();
       if($container) echo "</div>";
     ?>

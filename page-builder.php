@@ -6,11 +6,11 @@
 
 <?php get_header(); ?>
 
-<?php get_template_part('includes/page-heading'); ?>
+<?php get_template_part('layout/common/page-heading'); ?>
 
 <div class="uk-container tm-container-margin">
 <?php
-  get_template_part("includes/page-builder");
+  get_template_part("layout/page-builder");
 ?>
 </div>
 

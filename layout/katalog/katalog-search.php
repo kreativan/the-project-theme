@@ -50,7 +50,7 @@ $search_query = new WP_Query($args);
 <div class="uk-grid uk-child-width-1-4@m uk-child-width-1-3@s uk-child-width-1-2 uk-margin-medium" uk-grid>
   <?php while( $search_query->have_posts() ) : $search_query->the_post(); ?>
   <div>
-    <?php get_template_part("katalog/katalog-item"); ?>
+    <?php get_template_part("layout/katalog/katalog-item"); ?>
   </div>
   <?php endwhile; ?>
 </div>

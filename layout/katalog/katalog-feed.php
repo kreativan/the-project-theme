@@ -29,7 +29,7 @@ $query = new WP_Query($args);
   <?php while( $query->have_posts() ) : $query->the_post(); ?>
 
     <div>
-      <?php get_template_part("katalog/katalog-item"); ?>
+      <?php get_template_part("layout/katalog/katalog-item"); ?>
     </div>
 
   <?php endwhile;?>

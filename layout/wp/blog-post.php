@@ -34,7 +34,7 @@ $categories = get_the_category();
 
 <?php 
   the_content(); 
-  get_template_part("includes/next-prev");
+  get_template_part("layout/common/next-prev");
 ?>
 
 <hr />

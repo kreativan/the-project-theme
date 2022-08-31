@@ -4,7 +4,7 @@
   <div>
 
     <div class="uk-panel">
-      <?php get_template_part("katalog/katalog-item"); ?>
+      <?php get_template_part("layout/katalog/katalog-item"); ?>
     </div>
 
   </div>

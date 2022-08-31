@@ -8,13 +8,13 @@
     </h1>
 
     <div class="uk-margin">
-      <?php get_template_part('katalog/katalog-nav'); ?>
+      <?php get_template_part('layout/katalog/katalog-nav'); ?>
     </div>
 
-    <?php get_template_part('katalog/katalog-grid') ?>
+    <?php get_template_part('layout/katalog/katalog-grid') ?>
 
     <?php 
-      get_template_part('includes/pagination'); 
+      get_template_part('layout/common/pagination'); 
     ?>
 
 

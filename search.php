@@ -17,8 +17,8 @@
   <h4 class="uk-heading-divider">Results for: <b><?= get_search_query() ?></b></h4>
 
   <?php 
-    get_template_part('includes/search-results'); 
-    get_template_part('includes/pagination', null);
+    get_template_part('layout/common/search-results'); 
+    get_template_part('layout/common/pagination', null);
   ?>
 
 </div>

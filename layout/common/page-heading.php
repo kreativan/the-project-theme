@@ -41,7 +41,7 @@ if($enable) {
     <h1 class="uk-heading-small"><?= $headline ?></h1>
 
     <?php
-    if($breadcrumb) get_template_part('includes/breadcrumb'); 
+    if($breadcrumb) get_template_part('layout/common/breadcrumb'); 
     ?>
 
   </div>

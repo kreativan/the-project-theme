@@ -8,7 +8,7 @@
     <?php the_content(); ?>
 
     <?php
-      if(is_shop()) get_template_part("includes/content");
+      if(is_shop()) get_template_part("layout/wp/content");
     ?>
 
   </div>

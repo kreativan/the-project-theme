@@ -61,40 +61,56 @@ $captcha = get_field('captcha', $id);
         <?php endif; ?>
 
         <?php if($field['acf_fc_layout'] == 'text') : ?>
-          <input 
-            class="uk-input" 
-            type="text" 
-            name="<?= $name ?>" 
-            placeholder="<?= $placeholder ?>"
-            id="input-<?= $name ?>" 
-            <?= $field['required'] ? 'required' : ''; ?>
-          />
-        <?php elseif($field['acf_fc_layout'] == 'email') : ?>
-          <input 
-            class="uk-input" 
-            type="email" 
-            name="<?= $name ?>" 
-            placeholder="<?= $placeholder ?>"
-            id="input-<?= $name ?>" 
-            <?= $field['required'] ? 'required' : ''; ?>
-          />
-        <?php elseif($field['acf_fc_layout'] == 'textarea') : ?>
-          <textarea class="uk-textarea" rows="5" name="<?= $name ?>" placeholder="<?= $placeholder ?>"></textarea>
-        <?php elseif($field['acf_fc_layout'] == 'file') : ?>
-          <div class="uk-width-1-1" uk-form-custom="target: true">
-            <input type="file" name="<?= $name ?>" multiple="false">
-            <input class="uk-input" type="text" placeholder="<?= $field['placeholder'] ?>" disabled>
-          </div>
-        <?php elseif($field['acf_fc_layout'] == 'select') : ?>
-        <select class="uk-select" name="<?= $name ?>">
           <?php
-            $options = explode(PHP_EOL, $field['options']);
+            get_template_part('/layout/input/input', null, [
+              'type' => 'text',
+              'name' => $name,
+              'placeholder' => $placeholder,
+              'required' => $field['required'] ? 1 : 0,
+            ]);
           ?>
-          <option value=''>- <?= $field['placeholder'] ?> -</option>
-          <?php foreach($options as $option) : ?>
-            <option value='<?= $option ?>'><?= $option ?></option>
-          <?php endforeach; ?>
-        </select>
+        <?php elseif($field['acf_fc_layout'] == 'email') : ?>
+          <?php
+            get_template_part('/layout/input/input', null, [
+              'type' => 'email',
+              'name' => $name,
+              'placeholder' => $placeholder,
+              'required' => $field['required'] ? 1 : 0,
+            ]);
+          ?>
+        <?php elseif($field['acf_fc_layout'] == 'textarea') : ?>
+          <?php
+            get_template_part('/layout/input/textarea', null, [
+              'type' => 'email',
+              'name' => $name,
+              'placeholder' => $placeholder,
+              'rows' => 5,
+              'required' => $field['required'] ? 1 : 0,
+            ]);
+          ?>
+        <?php elseif($field['acf_fc_layout'] == 'file') : ?>
+          <?php
+            get_template_part('/layout/input/file', null, [
+              'name' => $name,
+              'placeholder' => $field['placeholder'],
+              'required' => $field['required'] ? 1 : 0,
+            ]);
+          ?>
+        <?php elseif($field['acf_fc_layout'] == 'select') : ?>
+          <?php
+            $arr = [];
+            $options = explode(PHP_EOL, $field['options']);
+            foreach($options as $opt) {
+              $i = explode('=', $opt);
+              $arr[$i[0]] = $i[1];
+            }
+            get_template_part('/layout/input/select', null, [
+              'name' => $name,
+              'placeholder' => $field['placeholder'],
+              'required' => $field['required'] ? 1 : 0,
+              'field_options' => $arr,
+            ]);
+          ?>
         <?php endif;?>
 
       </div>
@@ -103,7 +119,7 @@ $captcha = get_field('captcha', $id);
 
   <?php if($captcha) : ?>
   <div class="uk-margin-small-top">
-    <?php get_template_part('includes/captcha'); ?>
+    <?php get_template_part('layout/input/captcha'); ?>
   </div>
   <?php endif;?>
 
