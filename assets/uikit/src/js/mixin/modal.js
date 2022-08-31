@@ -2,14 +2,11 @@ import {
     $,
     addClass,
     append,
-    apply,
     attr,
     css,
-    endsWith,
     includes,
     isFocusable,
     last,
-    noop,
     on,
     once,
     parent,
@@ -17,8 +14,8 @@ import {
     pointerDown,
     pointerUp,
     removeClass,
-    scrollParents,
     toFloat,
+    toMs,
     width,
     within,
 } from 'uikit-util';
@@ -124,26 +121,17 @@ export default {
             self: true,
 
             handler() {
-                once(
-                    this.$el,
-                    'hide',
-                    on(document, 'focusin', (e) => {
-                        if (last(active) === this && !within(e.target, this.$el)) {
-                            this.$el.focus();
-                        }
-                    })
-                );
+                const docEl = document.documentElement;
 
-                if (this.overlay) {
-                    once(this.$el, 'hidden', preventOverscroll(this.$el), { self: true });
-                    once(this.$el, 'hidden', preventBackgroundScroll(), { self: true });
+                if (width(window) > docEl.clientWidth && this.overlay) {
+                    css(document.body, 'overflowY', 'scroll');
                 }
 
                 if (this.stack) {
                     css(this.$el, 'zIndex', toFloat(css(this.$el, 'zIndex')) + active.length);
                 }
 
-                addClass(document.documentElement, this.clsPage);
+                addClass(docEl, this.clsPage);
 
                 if (this.bgClose) {
                     once(
@@ -218,6 +206,10 @@ export default {
                     active.splice(active.indexOf(this), 1);
                 }
 
+                if (!active.length) {
+                    css(document.body, 'overflowY', '');
+                }
+
                 css(this.$el, 'zIndex', '');
 
                 if (!active.some((modal) => modal.clsPage === this.clsPage)) {
@@ -253,7 +245,7 @@ function animate({ transitionElement, _toggle }) {
     return (el, show) =>
         new Promise((resolve, reject) =>
             once(el, 'show hide', () => {
-                el._reject?.();
+                el._reject && el._reject();
                 el._reject = reject;
 
                 _toggle(el, show);
@@ -276,89 +268,4 @@ function animate({ transitionElement, _toggle }) {
                 }, toMs(css(transitionElement, 'transitionDuration')));
             })
         ).then(() => delete el._reject);
-}
-
-function toMs(time) {
-    return time ? (endsWith(time, 'ms') ? toFloat(time) : toFloat(time) * 1000) : 0;
-}
-
-export function preventOverscroll(el) {
-    if (CSS.supports('overscroll-behavior', 'contain')) {
-        const elements = filterChildren(el, (child) => /auto|scroll/.test(css(child, 'overflow')));
-        css(elements, 'overscrollBehavior', 'contain');
-        return () => css(elements, 'overscrollBehavior', '');
-    }
-
-    let startClientY;
-
-    const events = [
-        on(
-            el,
-            'touchstart',
-            ({ targetTouches }) => {
-                if (targetTouches.length === 1) {
-                    startClientY = targetTouches[0].clientY;
-                }
-            },
-            { passive: true }
-        ),
-
-        on(
-            el,
-            'touchmove',
-            (e) => {
-                if (e.targetTouches.length !== 1) {
-                    return;
-                }
-
-                let [scrollParent] = scrollParents(e.target, /auto|scroll/);
-                if (!within(scrollParent, el)) {
-                    scrollParent = el;
-                }
-
-                const clientY = e.targetTouches[0].clientY - startClientY;
-                const { scrollTop, scrollHeight, clientHeight } = scrollParent;
-
-                if (
-                    clientHeight >= scrollHeight ||
-                    (scrollTop === 0 && clientY > 0) ||
-                    (scrollHeight - scrollTop <= clientHeight && clientY < 0)
-                ) {
-                    e.cancelable && e.preventDefault();
-                }
-            },
-            { passive: false }
-        ),
-    ];
-
-    return () => events.forEach((fn) => fn());
-}
-
-let prevented;
-export function preventBackgroundScroll() {
-    if (prevented) {
-        return noop;
-    }
-    prevented = true;
-
-    const { scrollingElement } = document;
-    css(scrollingElement, {
-        overflowY: 'hidden',
-        touchAction: 'none',
-        paddingRight: width(window) - scrollingElement.clientWidth,
-    });
-    return () => {
-        prevented = false;
-        css(scrollingElement, { overflowY: '', touchAction: '', paddingRight: '' });
-    };
-}
-
-function filterChildren(el, fn) {
-    const children = [];
-    apply(el, (node) => {
-        if (fn(node)) {
-            children.push(node);
-        }
-    });
-    return children;
 }

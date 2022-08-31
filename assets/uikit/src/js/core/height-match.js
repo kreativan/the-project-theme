@@ -1,10 +1,7 @@
-import Resize from '../mixin/resize';
 import { getRows } from './margin';
-import { $$, boxModelAdjust, css, dimensions, isVisible } from 'uikit-util';
+import { $$, boxModelAdjust, css, dimensions, isVisible, toFloat } from 'uikit-util';
 
 export default {
-    mixins: [Resize],
-
     args: 'target',
 
     props: {
@@ -15,22 +12,13 @@ export default {
     data: {
         target: '> *',
         row: true,
+        forceHeight: true,
     },
 
     computed: {
-        elements: {
-            get({ target }, $el) {
-                return $$(target, $el);
-            },
-
-            watch() {
-                this.$reset();
-            },
+        elements({ target }, $el) {
+            return $$(target, $el);
         },
-    },
-
-    resizeTargets() {
-        return [this.$el, ...this.elements];
     },
 
     update: {
@@ -55,14 +43,22 @@ function match(elements) {
         return { heights: [''], elements };
     }
 
-    css(elements, 'minHeight', '');
     let heights = elements.map(getHeight);
-    const max = Math.max(...heights);
+    let max = Math.max(...heights);
+    const hasMinHeight = elements.some((el) => el.style.minHeight);
+    const hasShrunk = elements.some((el, i) => !el.style.minHeight && heights[i] < max);
 
-    return {
-        heights: elements.map((el, i) => (heights[i].toFixed(2) === max.toFixed(2) ? '' : max)),
-        elements,
-    };
+    if (hasMinHeight && hasShrunk) {
+        css(elements, 'minHeight', '');
+        heights = elements.map(getHeight);
+        max = Math.max(...heights);
+    }
+
+    heights = elements.map((el, i) =>
+        heights[i] === max && toFloat(el.style.minHeight).toFixed(2) !== max.toFixed(2) ? '' : max
+    );
+
+    return { heights, elements };
 }
 
 function getHeight(element) {

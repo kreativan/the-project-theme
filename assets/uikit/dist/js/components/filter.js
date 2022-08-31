@@ -1,4 +1,4 @@
-/*! UIkit 3.15.1 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
+/*! UIkit 3.12.2 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('uikit-util')) :
@@ -449,7 +449,7 @@
 
         },
 
-        async setState(state, animate) {if (animate === void 0) {animate = true;}
+        setState(state, animate) {if (animate === void 0) {animate = true;}
           state = { filter: { '': '' }, sort: [], ...state };
 
           uikitUtil.trigger(this.$el, 'beforeFilter', [this, state]);
@@ -458,17 +458,15 @@
           uikitUtil.toggleClass(el, this.cls, !!matchFilter(el, this.attrItem, state)));
 
 
-          await Promise.all(
+          Promise.all(
           uikitUtil.$$(this.target, this.$el).map((target) => {
             const filterFn = () => {
               applyState(state, target, uikitUtil.children(target));
               this.$update(this.$el);
             };
             return animate ? this.animate(filterFn, target) : filterFn();
-          }));
-
-
-          uikitUtil.trigger(this.$el, 'afterFilter', [this]);
+          })).
+          then(() => uikitUtil.trigger(this.$el, 'afterFilter', [this]));
         },
 
         updateState() {
@@ -542,7 +540,7 @@
     }
 
     function isEqualList(listA, listB) {
-      return listA.length === listB.length && listA.every((el) => listB.includes(el));
+      return listA.length === listB.length && listA.every((el) => ~listB.indexOf(el));
     }
 
     function getSelector(_ref4) {let { filter } = _ref4;

@@ -1,9 +1,8 @@
 import Video from './video';
-import { css, Dimensions, parent } from 'uikit-util';
-import Resize from '../mixin/resize';
+import { css, Dimensions, observeResize, parent } from 'uikit-util';
 
 export default {
-    mixins: [Resize, Video],
+    mixins: [Video],
 
     props: {
         width: Number,
@@ -14,50 +13,31 @@ export default {
         automute: true,
     },
 
-    events: {
-        'load loadedmetadata'() {
-            this.$emit('resize');
-        },
-    },
-
-    resizeTargets() {
-        return [this.$el, parent(this.$el)];
+    connected() {
+        this.registerObserver(observeResize(this.$el, () => this.$emit('resize')));
     },
 
     update: {
         read() {
-            const { ratio, cover } = Dimensions;
-            const { $el, width, height } = this;
-
-            let dim = { width, height };
+            const el = this.$el;
+            const { offsetHeight: height, offsetWidth: width } =
+                getPositionedParent(el) || parent(el);
+            const dim = Dimensions.cover(
+                {
+                    width: this.width || el.naturalWidth || el.videoWidth || el.clientWidth,
+                    height: this.height || el.naturalHeight || el.videoHeight || el.clientHeight,
+                },
+                {
+                    width: width + (width % 2 ? 1 : 0),
+                    height: height + (height % 2 ? 1 : 0),
+                }
+            );
 
             if (!dim.width || !dim.height) {
-                const intrinsic = {
-                    width: $el.naturalWidth || $el.videoWidth || $el.clientWidth,
-                    height: $el.naturalHeight || $el.videoHeight || $el.clientHeight,
-                };
-
-                if (dim.width) {
-                    dim = ratio(intrinsic, 'width', dim.width);
-                } else if (height) {
-                    dim = ratio(intrinsic, 'height', dim.height);
-                } else {
-                    dim = intrinsic;
-                }
-            }
-
-            const { offsetHeight: coverHeight, offsetWidth: coverWidth } =
-                getPositionedParent($el) || parent($el);
-            const coverDim = cover(dim, {
-                width: coverWidth + (coverWidth % 2 ? 1 : 0),
-                height: coverHeight + (coverHeight % 2 ? 1 : 0),
-            });
-
-            if (!coverDim.width || !coverDim.height) {
                 return false;
             }
 
-            return coverDim;
+            return dim;
         },
 
         write({ height, width }) {

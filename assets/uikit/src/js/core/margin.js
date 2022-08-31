@@ -1,16 +1,6 @@
-import Resize from '../mixin/resize';
-import {
-    isRtl,
-    isVisible,
-    observeMutation,
-    offsetPosition,
-    toArray,
-    toggleClass,
-} from 'uikit-util';
+import { isRtl, isVisible, offsetPosition, toggleClass } from 'uikit-util';
 
 export default {
-    mixins: [Resize],
-
     props: {
         margin: String,
         firstColumn: Boolean,
@@ -19,18 +9,6 @@ export default {
     data: {
         margin: 'uk-margin-small-top',
         firstColumn: 'uk-first-column',
-    },
-
-    resizeTargets() {
-        return [this.$el, ...toArray(this.$el.children)];
-    },
-
-    connected() {
-        this.registerObserver(
-            observeMutation(this.$el, () => this.$reset(), {
-                childList: true,
-            })
-        );
     },
 
     update: {
@@ -47,7 +25,7 @@ export default {
             for (const row of rows) {
                 for (const column of row) {
                     toggleClass(column, this.margin, rows[0] !== row);
-                    toggleClass(column, this.firstColumn, columns[0].includes(column));
+                    toggleClass(column, this.firstColumn, !!~columns[0].indexOf(column));
                 }
             }
         },

@@ -10,13 +10,14 @@ import {
     css,
     findIndex,
     getEventPos,
+    getViewport,
     hasTouch,
     height,
     index,
     isEmpty,
     isInput,
     off,
-    offsetViewport,
+    offset,
     on,
     parent,
     pointerDown,
@@ -26,6 +27,7 @@ import {
     remove,
     removeClass,
     scrollParents,
+    scrollTop,
     toggleClass,
     Transition,
     trigger,
@@ -312,7 +314,7 @@ function trackScroll(pos) {
     let last = Date.now();
     trackTimer = setInterval(() => {
         let { x, y } = pos;
-        y += document.scrollingElement.scrollTop;
+        y += scrollTop(window);
 
         const dist = (Date.now() - last) * 0.3;
         last = Date.now();
@@ -322,7 +324,7 @@ function trackScroll(pos) {
             .some((scrollEl) => {
                 let { scrollTop: scroll, scrollHeight } = scrollEl;
 
-                const { top, bottom, height } = offsetViewport(scrollEl);
+                const { top, bottom, height } = offset(getViewport(scrollEl));
 
                 if (top < y && top + 35 > y) {
                     scroll -= dist;
@@ -333,7 +335,7 @@ function trackScroll(pos) {
                 }
 
                 if (scroll > 0 && scroll < scrollHeight - height) {
-                    scrollEl.scrollTop = scroll;
+                    scrollTop(scrollEl, scroll);
                     return true;
                 }
             });

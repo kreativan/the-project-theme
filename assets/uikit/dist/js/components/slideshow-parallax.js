@@ -1,4 +1,4 @@
-/*! UIkit 3.15.1 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
+/*! UIkit 3.12.2 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('uikit-util')) :
@@ -15,38 +15,25 @@
         media: false },
 
 
-      connected() {
-        const media = toMedia(this.media, this.$el);
-        this.matchMedia = true;
-        if (media) {
-          this.mediaObj = window.matchMedia(media);
-          const handler = () => {
-            this.matchMedia = this.mediaObj.matches;
-            uikitUtil.trigger(this.$el, uikitUtil.createEvent('mediachange', false, true, [this.mediaObj]));
-          };
-          this.offMediaObj = uikitUtil.on(this.mediaObj, 'change', () => {
-            handler();
-            this.$emit('resize');
-          });
-          handler();
-        }
-      },
-
-      disconnected() {var _this$offMediaObj;
-        (_this$offMediaObj = this.offMediaObj) == null ? void 0 : _this$offMediaObj.call(this);
-      } };
+      computed: {
+        matchMedia() {
+          const media = toMedia(this.media);
+          return !media || window.matchMedia(media).matches;
+        } } };
 
 
-    function toMedia(value, element) {
+
+    function toMedia(value) {
       if (uikitUtil.isString(value)) {
-        if (uikitUtil.startsWith(value, '@')) {
-          value = uikitUtil.toFloat(uikitUtil.css(element, "--uk-breakpoint-" + value.substr(1)));
+        if (value[0] === '@') {
+          const name = "breakpoint-" + value.substr(1);
+          value = uikitUtil.toFloat(uikitUtil.getCssVar(name));
         } else if (isNaN(value)) {
           return value;
         }
       }
 
-      return value && uikitUtil.isNumeric(value) ? "(min-width: " + value + "px)" : '';
+      return value && !isNaN(value) ? "(min-width: " + value + "px)" : false;
     }
 
     uikitUtil.memoize(async (src) => {
@@ -108,17 +95,12 @@
 
       computed: {
         props(properties, $el) {
-          const stops = {};
-          for (const prop in properties) {
-            if (prop in props && !uikitUtil.isUndefined(properties[prop])) {
-              stops[prop] = properties[prop].slice();
+          return keys(props).reduce((result, prop) => {
+            if (!uikitUtil.isUndefined(properties[prop])) {
+              result[prop] = props[prop](prop, $el, properties[prop].slice());
             }
-          }
-          const result = {};
-          for (const prop in stops) {
-            result[prop] = props[prop](prop, $el, stops[prop], stops);
-          }
-          return result;
+            return result;
+          }, {});
         } },
 
 
@@ -130,9 +112,7 @@
 
       methods: {
         reset() {
-          for (const prop in this.getCss(0)) {
-            uikitUtil.css(this.$el, prop, '');
-          }
+          uikitUtil.each(this.getCss(0), (_, prop) => uikitUtil.css(this.$el, prop, ''));
         },
 
         getCss(percent) {
@@ -146,16 +126,12 @@
 
 
     function transformFn(prop, el, stops) {
-      let unit = getUnit(stops) || { x: 'px', y: 'px', rotate: 'deg' }[prop] || '';
+      const unit = getUnit(stops) || { x: 'px', y: 'px', rotate: 'deg' }[prop] || '';
       let transformFn;
 
       if (prop === 'x' || prop === 'y') {
         prop = "translate" + uikitUtil.ucfirst(prop);
         transformFn = (stop) => uikitUtil.toFloat(uikitUtil.toFloat(stop).toFixed(unit === 'px' ? 0 : 6));
-      } else if (prop === 'scale') {
-        unit = '';
-        transformFn = (stop) =>
-        getUnit([stop]) ? uikitUtil.toPx(stop, 'width', el, true) / el.offsetWidth : stop;
       }
 
       if (stops.length === 1) {
@@ -247,66 +223,58 @@
       };
     }
 
-    function backgroundFn(prop, el, stops, props) {
+    function backgroundFn(prop, el, stops) {
       if (stops.length === 1) {
         stops.unshift(0);
       }
 
-      const attr = prop === 'bgy' ? 'height' : 'width';
-      props[prop] = parseStops(stops, (stop) => uikitUtil.toPx(stop, attr, el));
+      prop = prop.substr(-1);
+      const attr = prop === 'y' ? 'height' : 'width';
+      stops = parseStops(stops, (stop) => uikitUtil.toPx(stop, attr, el));
 
-      const bgProps = ['bgx', 'bgy'].filter((prop) => prop in props);
-      if (bgProps.length === 2 && prop === 'bgx') {
-        return uikitUtil.noop;
-      }
+      const bgPos = getCssValue(el, "background-position-" + prop, '');
 
-      if (getCssValue(el, 'backgroundSize', '') === 'cover') {
-        return backgroundCoverFn(prop, el, stops, props);
-      }
-
-      const positions = {};
-      for (const prop of bgProps) {
-        positions[prop] = getBackgroundPos(el, prop);
-      }
-
-      return setBackgroundPosFn(bgProps, positions, props);
+      return getCssValue(el, 'backgroundSize', '') === 'cover' ?
+      backgroundCoverFn(prop, el, stops, bgPos, attr) :
+      setBackgroundPosFn(prop, stops, bgPos);
     }
 
-    function backgroundCoverFn(prop, el, stops, props) {
+    function backgroundCoverFn(prop, el, stops, bgPos, attr) {
       const dimImage = getBackgroundImageDimensions(el);
 
       if (!dimImage.width) {
         return uikitUtil.noop;
       }
 
+      const values = stops.map((_ref2) => {let [value] = _ref2;return value;});
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const down = values.indexOf(min) < values.indexOf(max);
+
+      const diff = max - min;
+      let pos = (down ? -diff : 0) - (down ? min : max);
+
       const dimEl = {
         width: el.offsetWidth,
         height: el.offsetHeight };
 
 
-      const bgProps = ['bgx', 'bgy'].filter((prop) => prop in props);
+      const baseDim = uikitUtil.Dimensions.cover(dimImage, dimEl);
+      const span = baseDim[attr] - dimEl[attr];
 
-      const positions = {};
-      for (const prop of bgProps) {
-        const values = props[prop].map((_ref2) => {let [value] = _ref2;return value;});
-        const min = Math.min(...values);
-        const max = Math.max(...values);
-        const down = values.indexOf(min) < values.indexOf(max);
-        const diff = max - min;
+      if (span < diff) {
+        dimEl[attr] = baseDim[attr] + diff - span;
+      } else if (span > diff) {
+        const posPercentage = dimEl[attr] / uikitUtil.toPx(bgPos, attr, el, true);
 
-        positions[prop] = (down ? -diff : 0) - (down ? min : max) + "px";
-        dimEl[prop === 'bgy' ? 'height' : 'width'] += diff;
+        if (posPercentage) {
+          pos -= (span - diff) / posPercentage;
+        }
       }
 
       const dim = uikitUtil.Dimensions.cover(dimImage, dimEl);
 
-      for (const prop of bgProps) {
-        const attr = prop === 'bgy' ? 'height' : 'width';
-        const overflow = dim[attr] - dimEl[attr];
-        positions[prop] = "max(" + getBackgroundPos(el, prop) + ",-" + overflow + "px) + " + positions[prop];
-      }
-
-      const fn = setBackgroundPosFn(bgProps, positions, props);
+      const fn = setBackgroundPosFn(prop, stops, pos + "px");
       return (css, percent) => {
         fn(css, percent);
         css.backgroundSize = dim.width + "px " + dim.height + "px";
@@ -314,16 +282,9 @@
       };
     }
 
-    function getBackgroundPos(el, prop) {
-      return getCssValue(el, "background-position-" + prop.substr(-1), '');
-    }
-
-    function setBackgroundPosFn(bgProps, positions, props) {
+    function setBackgroundPosFn(prop, stops, pos) {
       return function (css, percent) {
-        for (const prop of bgProps) {
-          const value = getValue(props[prop], percent);
-          css["background-position-" + prop.substr(-1)] = "calc(" + positions[prop] + " + " + value + "px)";
-        }
+        css["background-position-" + prop] = "calc(" + pos + " + " + getValue(stops, percent) + "px)";
       };
     }
 
@@ -342,7 +303,7 @@
         if (!image.naturalWidth) {
           image.onload = () => {
             dimensions[src] = toDimensions(image);
-            uikitUtil.trigger(el, uikitUtil.createEvent('load', false));
+            uikitUtil.trigger(el, 'load');
           };
           return toDimensions(image);
         }
@@ -414,7 +375,7 @@
       return uikitUtil.isNumber(start) ? start + Math.abs(start - end) * p * (start < end ? 1 : -1) : +end;
     }
 
-    const unitRe = /^-?\d+(\S*)/;
+    const unitRe = /^-?\d+([^\s]*)/;
     function getUnit(stops, defaultUnit) {
       for (const stop of stops) {
         const match = stop.match == null ? void 0 : stop.match(unitRe);
@@ -446,13 +407,11 @@
         selItem: '!li' },
 
 
-      beforeConnect() {
-        this.item = uikitUtil.query(this.selItem, this.$el);
-      },
+      computed: {
+        item(_ref, $el) {let { selItem } = _ref;
+          return uikitUtil.query(selItem, $el);
+        } },
 
-      disconnected() {
-        this.item = null;
-      },
 
       events: [
       {
@@ -464,7 +423,7 @@
           return this.item;
         },
 
-        handler(_ref) {let { type, detail: { percent, duration, timing, dir } } = _ref;
+        handler(_ref2) {let { type, detail: { percent, duration, timing, dir } } = _ref2;
           uikitUtil.fastdom.read(() => {
             const propsFrom = this.getCss(getCurrentPercent(type, dir, percent));
             const propsTo = this.getCss(isIn(type) ? 0.5 : dir > 0 ? 1 : 0);
@@ -499,7 +458,7 @@
           return this.item;
         },
 
-        handler(_ref2) {let { type, detail: { percent, dir } } = _ref2;
+        handler(_ref3) {let { type, detail: { percent, dir } } = _ref3;
           uikitUtil.fastdom.read(() => {
             const props = this.getCss(getCurrentPercent(type, dir, percent));
             uikitUtil.fastdom.write(() => uikitUtil.css(this.$el, props));

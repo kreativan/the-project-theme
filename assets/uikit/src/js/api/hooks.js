@@ -11,7 +11,7 @@ export default function (UIkit) {
         }
 
         this._data = {};
-        this._computed = {};
+        this._computeds = {};
 
         this._initProps();
 
@@ -96,11 +96,7 @@ export default function (UIkit) {
             }
 
             if (write && result !== false) {
-                fastdom.write(() => {
-                    if (this._connected) {
-                        write.call(this, this._data, types);
-                    }
-                });
+                fastdom.write(() => write.call(this, this._data, types));
             }
         }
     }
@@ -109,8 +105,8 @@ export default function (UIkit) {
         const {
             $options: { computed },
         } = this;
-        const values = { ...this._computed };
-        this._computed = {};
+        const values = { ...this._computeds };
+        this._computeds = {};
 
         for (const key in computed) {
             const { watch, immediate } = computed[key];

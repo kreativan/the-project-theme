@@ -2,7 +2,6 @@ import {
     css,
     hasAttr,
     isInView,
-    isTag,
     isVideo,
     isVisible,
     mute,
@@ -24,22 +23,22 @@ export default {
         autoplay: true,
     },
 
-    connected() {
-        this.inView = this.autoplay === 'inview';
+    computed: {
+        inView({ autoplay }) {
+            return autoplay === 'inview';
+        },
+    },
 
+    connected() {
         if (this.inView && !hasAttr(this.$el, 'preload')) {
             this.$el.preload = 'none';
-        }
-
-        if (isTag(this.$el, 'iframe') && !hasAttr(this.$el, 'allow')) {
-            this.$el.allow = 'autoplay';
         }
 
         if (this.automute) {
             mute(this.$el);
         }
 
-        this.registerObserver(observeIntersection(this.$el, () => this.$emit(), {}, false));
+        this.registerObserver(observeIntersection(this.$el, () => this.$emit('scroll'), {}, false));
     },
 
     update: {
@@ -61,5 +60,7 @@ export default {
                 play(this.$el);
             }
         },
+
+        events: ['resize', 'scroll'],
     },
 };

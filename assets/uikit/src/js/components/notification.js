@@ -56,9 +56,7 @@ export default {
         this.$mount(
             append(
                 container,
-                `<div class="${this.clsMsg}${
-                    this.status ? ` ${this.clsMsg}-${this.status}` : ''
-                }" role="alert">
+                `<div class="${this.clsMsg}${this.status ? ` ${this.clsMsg}-${this.status}` : ''}">
                 <a href class="${this.clsClose}" data-uk-close></a>
                 <div>${this.message}</div>
             </div>`

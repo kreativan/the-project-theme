@@ -21,7 +21,6 @@
 // ========================================================================
 
 @tooltip-z-index:                               @global-z-index + 30;
-@tooltip-margin:                                10px;
 @tooltip-max-width:                             200px;
 @tooltip-padding-vertical:                      3px;
 @tooltip-padding-horizontal:                    6px;
@@ -30,6 +29,7 @@
 @tooltip-color:                                 @global-inverse-color;
 @tooltip-font-size:                             12px;
 
+@tooltip-margin:                                10px;
 
 
 /* ========================================================================
@@ -50,8 +50,6 @@
     /* 2 */
     position: absolute;
     z-index: @tooltip-z-index;
-    --uk-position-offset: @tooltip-margin;
-    --uk-position-viewport-offset: 10;
     /* 3 */
     top: 0;
     /* 4 */
@@ -68,6 +66,16 @@
 
 /* Show */
 .uk-tooltip.uk-active { display: block; }
+
+
+/* Direction / Alignment modifiers
+ ========================================================================== */
+
+/* Direction */
+[class*='uk-tooltip-top'] { margin-top: -@tooltip-margin; }
+[class*='uk-tooltip-bottom'] { margin-top: @tooltip-margin; }
+[class*='uk-tooltip-left'] { margin-left: -@tooltip-margin; }
+[class*='uk-tooltip-right'] { margin-left: @tooltip-margin; }
 
 
 // Hooks

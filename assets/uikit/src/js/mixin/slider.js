@@ -1,4 +1,3 @@
-import Resize from './resize';
 import SliderAutoplay from './slider-autoplay';
 import SliderDrag from './slider-drag';
 import SliderNav from './slider-nav';
@@ -16,7 +15,7 @@ import {
 } from 'uikit-util';
 
 export default {
-    mixins: [SliderAutoplay, SliderDrag, SliderNav, Resize],
+    mixins: [SliderAutoplay, SliderDrag, SliderNav],
 
     props: {
         clsActivated: Boolean,

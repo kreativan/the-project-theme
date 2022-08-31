@@ -103,7 +103,7 @@ export default {
                 });
         },
 
-        async setState(state, animate = true) {
+        setState(state, animate = true) {
             state = { filter: { '': '' }, sort: [], ...state };
 
             trigger(this.$el, 'beforeFilter', [this, state]);
@@ -112,7 +112,7 @@ export default {
                 toggleClass(el, this.cls, !!matchFilter(el, this.attrItem, state))
             );
 
-            await Promise.all(
+            Promise.all(
                 $$(this.target, this.$el).map((target) => {
                     const filterFn = () => {
                         applyState(state, target, getChildren(target));
@@ -120,9 +120,7 @@ export default {
                     };
                     return animate ? this.animate(filterFn, target) : filterFn();
                 })
-            );
-
-            trigger(this.$el, 'afterFilter', [this]);
+            ).then(() => trigger(this.$el, 'afterFilter', [this]));
         },
 
         updateState() {
@@ -196,7 +194,7 @@ function matchFilter(
 }
 
 function isEqualList(listA, listB) {
-    return listA.length === listB.length && listA.every((el) => listB.includes(el));
+    return listA.length === listB.length && listA.every((el) => ~listB.indexOf(el));
 }
 
 function getSelector({ filter }) {

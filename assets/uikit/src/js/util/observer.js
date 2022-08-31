@@ -1,74 +1,33 @@
-import { on } from './event';
 import { toNodes } from './lang';
-import { fastdom } from './fastdom';
-import { inBrowser } from './env';
 
+// Old chromium based browsers (UC Browser) did not implement `isIntersecting`
+export const hasIntersectionObserver =
+    window.IntersectionObserver && 'isIntersecting' in IntersectionObserverEntry.prototype;
 export function observeIntersection(targets, cb, options, intersecting = true) {
-    const observer = new IntersectionObserver(
-        intersecting
-            ? (entries, observer) => {
-                  if (entries.some((entry) => entry.isIntersecting)) {
-                      cb(entries, observer);
-                  }
-              }
-            : cb,
-        options
-    );
-    for (const el of toNodes(targets)) {
-        observer.observe(el);
-    }
-
-    return observer;
-}
-
-const hasResizeObserver = inBrowser && window.ResizeObserver;
-export function observeResize(targets, cb, options = { box: 'border-box' }) {
-    if (hasResizeObserver) {
-        return observe(ResizeObserver, targets, cb, options);
-    }
-
-    // Fallback Safari < 13.1
-    initResizeListener();
-    listeners.add(cb);
-
-    return {
-        disconnect() {
-            listeners.delete(cb);
-        },
-    };
-}
-
-let listeners;
-function initResizeListener() {
-    if (listeners) {
+    if (!hasIntersectionObserver) {
         return;
     }
 
-    listeners = new Set();
-
-    // throttle 'resize'
-    let pendingResize;
-    const handleResize = () => {
-        if (pendingResize) {
-            return;
+    const observer = new IntersectionObserver((entries, observer) => {
+        if (!intersecting || entries.some((entry) => entry.isIntersecting)) {
+            cb(entries, observer);
         }
-        pendingResize = true;
-        fastdom.read(() => (pendingResize = false));
-        for (const listener of listeners) {
-            listener();
-        }
-    };
-
-    on(window, 'load resize', handleResize);
-    on(document, 'loadedmetadata load', handleResize, true);
+    }, options);
+    for (const el of toNodes(targets)) {
+        observer.observe(el);
+    }
+    return observer;
 }
 
-export function observeMutation(targets, cb, options) {
-    return observe(MutationObserver, targets, cb, options);
-}
+const hasResizeObserver = window.ResizeObserver;
+export function observeResize(targets, cb, options = { box: 'border-box' }) {
+    if (!hasResizeObserver) {
+        return;
+    }
 
-function observe(Observer, targets, cb, options) {
-    const observer = new Observer(cb);
+    const observer = new ResizeObserver((entries, observer) => {
+        cb(entries, observer);
+    });
     for (const el of toNodes(targets)) {
         observer.observe(el, options);
     }

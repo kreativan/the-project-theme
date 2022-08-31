@@ -28,41 +28,40 @@ function getContext(selector, context = document) {
 }
 
 const contextSanitizeRe = /([!>+~-])(?=\s+[!>+~-]|\s*$)/g;
-const sanatize = memoize((selector) => selector.replace(contextSanitizeRe, '$1 *'));
 
 function _query(selector, context = document, queryFn) {
     if (!selector || !isString(selector)) {
         return selector;
     }
 
-    selector = sanatize(selector);
+    selector = selector.replace(contextSanitizeRe, '$1 *');
 
     if (isContextSelector(selector)) {
-        const split = splitSelector(selector);
-        selector = '';
-        for (let sel of split) {
-            let ctx = context;
+        selector = splitSelector(selector)
+            .map((selector) => {
+                let ctx = context;
 
-            if (sel[0] === '!') {
-                const selectors = sel.substr(1).trim().split(' ');
-                ctx = closest(parent(context), selectors[0]);
-                sel = selectors.slice(1).join(' ').trim();
-                if (!sel.length && split.length === 1) {
-                    return ctx;
+                if (selector[0] === '!') {
+                    const selectors = selector.substr(1).trim().split(' ');
+                    ctx = closest(parent(context), selectors[0]);
+                    selector = selectors.slice(1).join(' ').trim();
                 }
-            }
 
-            if (sel[0] === '-') {
-                const selectors = sel.substr(1).trim().split(' ');
-                const prev = (ctx || context).previousElementSibling;
-                ctx = matches(prev, sel.substr(1)) ? prev : null;
-                sel = selectors.slice(1).join(' ');
-            }
+                if (selector[0] === '-') {
+                    const selectors = selector.substr(1).trim().split(' ');
+                    const prev = (ctx || context).previousElementSibling;
+                    ctx = matches(prev, selector.substr(1)) ? prev : null;
+                    selector = selectors.slice(1).join(' ');
+                }
 
-            if (ctx) {
-                selector += `${selector ? ',' : ''}${domPath(ctx)} ${sel}`;
-            }
-        }
+                if (!ctx) {
+                    return null;
+                }
+
+                return `${domPath(ctx)} ${selector}`;
+            })
+            .filter(Boolean)
+            .join(',');
 
         context = document;
     }

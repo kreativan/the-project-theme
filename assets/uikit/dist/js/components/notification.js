@@ -1,4 +1,4 @@
-/*! UIkit 3.15.1 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
+/*! UIkit 3.12.2 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('uikit-util')) :
@@ -61,9 +61,7 @@
         this.$mount(
         uikitUtil.append(
         container, "<div class=\"" +
-        this.clsMsg + (
-        this.status ? " " + this.clsMsg + "-" + this.status : '') + "\" role=\"alert\"> <a href class=\"" +
-
+        this.clsMsg + (this.status ? " " + this.clsMsg + "-" + this.status : '') + "\"> <a href class=\"" +
         this.clsClose + "\" data-uk-close></a> <div>" +
         this.message + "</div> </div>"));
 

@@ -207,6 +207,7 @@ export default {
                 let matches;
                 const iframeAttrs = {
                     frameborder: '0',
+                    allow: 'autoplay',
                     allowfullscreen: '',
                     style: 'max-width: 100%; box-sizing: border-box;',
                     'uk-responsive': '',
@@ -214,10 +215,7 @@ export default {
                 };
 
                 // Image
-                if (
-                    type === 'image' ||
-                    src.match(/\.(avif|jpe?g|jfif|a?png|gif|svg|webp)($|\?)/i)
-                ) {
+                if (type === 'image' || src.match(/\.(avif|jpe?g|a?png|gif|svg|webp)($|\?)/i)) {
                     try {
                         const { width, height } = await getImage(src, attrs.srcset, attrs.size);
                         this.setItem(item, createEl('img', { src, width, height, alt, ...attrs }));

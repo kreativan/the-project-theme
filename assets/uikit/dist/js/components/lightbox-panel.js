@@ -1,4 +1,4 @@
-/*! UIkit 3.15.1 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
+/*! UIkit 3.12.2 | https://www.getuikit.com | (c) 2014 - 2022 YOOtheme | MIT License */
 
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('uikit-util')) :
@@ -97,7 +97,6 @@
         cls: Boolean,
         animation: 'list',
         duration: Number,
-        velocity: Number,
         origin: String,
         transition: String },
 
@@ -106,11 +105,28 @@
         cls: false,
         animation: [false],
         duration: 200,
-        velocity: 0.2,
         origin: false,
-        transition: 'ease',
+        transition: 'linear',
         clsEnter: 'uk-togglabe-enter',
-        clsLeave: 'uk-togglabe-leave' },
+        clsLeave: 'uk-togglabe-leave',
+
+        initProps: {
+          overflow: '',
+          height: '',
+          paddingTop: '',
+          paddingBottom: '',
+          marginTop: '',
+          marginBottom: '' },
+
+
+        hideProps: {
+          overflow: 'hidden',
+          height: 0,
+          paddingTop: 0,
+          paddingBottom: 0,
+          marginTop: 0,
+          marginBottom: 0 } },
+
 
 
       computed: {
@@ -119,7 +135,7 @@
         },
 
         hasTransition(_ref2) {let { animation } = _ref2;
-          return ['slide', 'reveal'].some((transition) => uikitUtil.startsWith(animation[0], transition));
+          return this.hasAnimation && animation[0] === true;
         } },
 
 
@@ -138,9 +154,9 @@
             uikitUtil.isFunction(animate) ?
             animate :
             animate === false || !this.hasAnimation ?
-            toggleInstant(this) :
+            this._toggle :
             this.hasTransition ?
-            toggleTransition(this) :
+            toggleHeight(this) :
             toggleAnimation(this))(
             el, show);
 
@@ -204,115 +220,44 @@
 
 
 
-    function toggleInstant(_ref3) {let { _toggle } = _ref3;
+    function toggleHeight(_ref3) {let { isToggled, duration, initProps, hideProps, transition, _toggle } = _ref3;
       return (el, show) => {
-        uikitUtil.Animation.cancel(el);
-        uikitUtil.Transition.cancel(el);
-        return _toggle(el, show);
-      };
-    }
-
-    function toggleTransition(cmp) {var _cmp$animation$;
-      const [mode = 'reveal', startProp = 'top'] = ((_cmp$animation$ = cmp.animation[0]) == null ? void 0 : _cmp$animation$.split('-')) || [];
-
-      const dirs = [
-      ['left', 'right'],
-      ['top', 'bottom']];
-
-      const dir = dirs[uikitUtil.includes(dirs[0], startProp) ? 0 : 1];
-      const end = dir[1] === startProp;
-      const props = ['width', 'height'];
-      const dimProp = props[dirs.indexOf(dir)];
-      const marginProp = "margin-" + dir[0];
-      const marginStartProp = "margin-" + startProp;
-
-      return async (el, show) => {
-        let { duration, velocity, transition, _toggle } = cmp;
-
-        let currentDim = uikitUtil.dimensions(el)[dimProp];
-
         const inProgress = uikitUtil.Transition.inProgress(el);
-        await uikitUtil.Transition.cancel(el);
+        const inner = el.hasChildNodes() ?
+        uikitUtil.toFloat(uikitUtil.css(el.firstElementChild, 'marginTop')) +
+        uikitUtil.toFloat(uikitUtil.css(el.lastElementChild, 'marginBottom')) :
+        0;
+        const currentHeight = uikitUtil.isVisible(el) ? uikitUtil.height(el) + (inProgress ? 0 : inner) : 0;
 
-        if (show) {
+        uikitUtil.Transition.cancel(el);
+
+        if (!isToggled(el)) {
           _toggle(el, true);
         }
 
-        const prevProps = Object.fromEntries(
-        [
-        'padding',
-        'border',
-        'width',
-        'height',
-        'overflowY',
-        'overflowX',
-        marginProp,
-        marginStartProp].
-        map((key) => [key, el.style[key]]));
+        uikitUtil.height(el, '');
 
+        // Update child components first
+        uikitUtil.fastdom.flush();
 
-        const dim = uikitUtil.dimensions(el);
-        const currentMargin = uikitUtil.toFloat(uikitUtil.css(el, marginProp));
-        const marginStart = uikitUtil.toFloat(uikitUtil.css(el, marginStartProp));
-        const endDim = dim[dimProp] + marginStart;
+        const endHeight = uikitUtil.height(el) + (inProgress ? 0 : inner);
+        uikitUtil.height(el, currentHeight);
 
-        if (!inProgress && !show) {
-          currentDim += marginStart;
-        }
+        return (
+        show ?
+        uikitUtil.Transition.start(
+        el,
+        { ...initProps, overflow: 'hidden', height: endHeight },
+        Math.round(duration * (1 - currentHeight / endHeight)),
+        transition) :
 
-        const [wrapper] = uikitUtil.wrapInner(el, '<div>');
-        uikitUtil.css(wrapper, {
-          boxSizing: 'border-box',
-          height: dim.height,
-          width: dim.width,
-          ...uikitUtil.css(el, [
-          'overflow',
-          'padding',
-          'borderTop',
-          'borderRight',
-          'borderBottom',
-          'borderLeft',
-          'borderImage',
-          marginStartProp]) });
-
-
-
-        uikitUtil.css(el, {
-          padding: 0,
-          border: 0,
-          minWidth: 0,
-          minHeight: 0,
-          [marginStartProp]: 0,
-          width: dim.width,
-          height: dim.height,
-          overflow: 'hidden',
-          [dimProp]: currentDim });
-
-
-        const percent = currentDim / endDim;
-        duration = (velocity * endDim + duration) * (show ? 1 - percent : percent);
-        const endProps = { [dimProp]: show ? endDim : 0 };
-
-        if (end) {
-          uikitUtil.css(el, marginProp, endDim - currentDim + currentMargin);
-          endProps[marginProp] = show ? currentMargin : endDim + currentMargin;
-        }
-
-        if (!end ^ mode === 'reveal') {
-          uikitUtil.css(wrapper, marginProp, -endDim + currentDim);
-          uikitUtil.Transition.start(wrapper, { [marginProp]: show ? 0 : -endDim }, duration, transition);
-        }
-
-        try {
-          await uikitUtil.Transition.start(el, endProps, duration, transition);
-        } finally {
-          uikitUtil.css(el, prevProps);
-          uikitUtil.unwrap(wrapper.firstChild);
-
-          if (!show) {
-            _toggle(el, false);
-          }
-        }
+        uikitUtil.Transition.start(
+        el,
+        hideProps,
+        Math.round(duration * (currentHeight / endHeight)),
+        transition).
+        then(() => _toggle(el, false))).
+        then(() => uikitUtil.css(el, initProps));
       };
     }
 
@@ -431,26 +376,17 @@
         self: true,
 
         handler() {
-          uikitUtil.once(
-          this.$el,
-          'hide',
-          uikitUtil.on(document, 'focusin', (e) => {
-            if (uikitUtil.last(active) === this && !uikitUtil.within(e.target, this.$el)) {
-              this.$el.focus();
-            }
-          }));
+          const docEl = document.documentElement;
 
-
-          if (this.overlay) {
-            uikitUtil.once(this.$el, 'hidden', preventOverscroll(this.$el), { self: true });
-            uikitUtil.once(this.$el, 'hidden', preventBackgroundScroll(), { self: true });
+          if (uikitUtil.width(window) > docEl.clientWidth && this.overlay) {
+            uikitUtil.css(document.body, 'overflowY', 'scroll');
           }
 
           if (this.stack) {
             uikitUtil.css(this.$el, 'zIndex', uikitUtil.toFloat(uikitUtil.css(this.$el, 'zIndex')) + active.length);
           }
 
-          uikitUtil.addClass(document.documentElement, this.clsPage);
+          uikitUtil.addClass(docEl, this.clsPage);
 
           if (this.bgClose) {
             uikitUtil.once(
@@ -525,6 +461,10 @@
             active.splice(active.indexOf(this), 1);
           }
 
+          if (!active.length) {
+            uikitUtil.css(document.body, 'overflowY', '');
+          }
+
           uikitUtil.css(this.$el, 'zIndex', '');
 
           if (!active.some((modal) => modal.clsPage === this.clsPage)) {
@@ -560,7 +500,7 @@
       return (el, show) =>
       new Promise((resolve, reject) =>
       uikitUtil.once(el, 'show hide', () => {
-        el._reject == null ? void 0 : el._reject();
+        el._reject && el._reject();
         el._reject = reject;
 
         _toggle(el, show);
@@ -580,94 +520,9 @@
         const timer = setTimeout(() => {
           off();
           resolve();
-        }, toMs(uikitUtil.css(transitionElement, 'transitionDuration')));
+        }, uikitUtil.toMs(uikitUtil.css(transitionElement, 'transitionDuration')));
       })).
       then(() => delete el._reject);
-    }
-
-    function toMs(time) {
-      return time ? uikitUtil.endsWith(time, 'ms') ? uikitUtil.toFloat(time) : uikitUtil.toFloat(time) * 1000 : 0;
-    }
-
-    function preventOverscroll(el) {
-      if (CSS.supports('overscroll-behavior', 'contain')) {
-        const elements = filterChildren(el, (child) => /auto|scroll/.test(uikitUtil.css(child, 'overflow')));
-        uikitUtil.css(elements, 'overscrollBehavior', 'contain');
-        return () => uikitUtil.css(elements, 'overscrollBehavior', '');
-      }
-
-      let startClientY;
-
-      const events = [
-      uikitUtil.on(
-      el,
-      'touchstart',
-      (_ref6) => {let { targetTouches } = _ref6;
-        if (targetTouches.length === 1) {
-          startClientY = targetTouches[0].clientY;
-        }
-      },
-      { passive: true }),
-
-
-      uikitUtil.on(
-      el,
-      'touchmove',
-      (e) => {
-        if (e.targetTouches.length !== 1) {
-          return;
-        }
-
-        let [scrollParent] = uikitUtil.scrollParents(e.target, /auto|scroll/);
-        if (!uikitUtil.within(scrollParent, el)) {
-          scrollParent = el;
-        }
-
-        const clientY = e.targetTouches[0].clientY - startClientY;
-        const { scrollTop, scrollHeight, clientHeight } = scrollParent;
-
-        if (
-        clientHeight >= scrollHeight ||
-        scrollTop === 0 && clientY > 0 ||
-        scrollHeight - scrollTop <= clientHeight && clientY < 0)
-        {
-          e.cancelable && e.preventDefault();
-        }
-      },
-      { passive: false })];
-
-
-
-      return () => events.forEach((fn) => fn());
-    }
-
-    let prevented;
-    function preventBackgroundScroll() {
-      if (prevented) {
-        return uikitUtil.noop;
-      }
-      prevented = true;
-
-      const { scrollingElement } = document;
-      uikitUtil.css(scrollingElement, {
-        overflowY: 'hidden',
-        touchAction: 'none',
-        paddingRight: uikitUtil.width(window) - scrollingElement.clientWidth });
-
-      return () => {
-        prevented = false;
-        uikitUtil.css(scrollingElement, { overflowY: '', touchAction: '', paddingRight: '' });
-      };
-    }
-
-    function filterChildren(el, fn) {
-      const children = [];
-      uikitUtil.apply(el, (node) => {
-        if (fn(node)) {
-          children.push(node);
-        }
-      });
-      return children;
     }
 
     function Transitioner(prev, next, dir, _ref) {let { animation, easing } = _ref;
@@ -737,15 +592,6 @@
       uikitUtil.trigger(el, uikitUtil.createEvent(type, false, false, data));
     }
 
-    var Resize = {
-      connected() {var _this$$options$resize;
-        this.registerObserver(
-        uikitUtil.observeResize(((_this$$options$resize = this.$options.resizeTargets) == null ? void 0 : _this$$options$resize.call(this)) || this.$el, () =>
-        this.$emit('resize')));
-
-
-      } };
-
     var SliderAutoplay = {
       props: {
         autoplay: Boolean,
@@ -811,11 +657,6 @@
           this.interval && clearInterval(this.interval);
         } } };
 
-    const pointerOptions = { passive: false, capture: true };
-    const pointerDown = 'touchstart mousedown';
-    const pointerMove = 'touchmove mousemove';
-    const pointerUp = 'touchend touchcancel mouseup click input';
-
     var SliderDrag = {
       props: {
         draggable: Boolean },
@@ -842,7 +683,7 @@
 
       events: [
       {
-        name: pointerDown,
+        name: uikitUtil.pointerDown,
 
         delegate() {
           return this.selSlides;
@@ -868,17 +709,7 @@
 
         handler(e) {
           e.preventDefault();
-        } },
-
-
-      {
-        // iOS workaround for slider stopping if swiping fast
-        name: pointerMove + " " + pointerUp,
-        el() {
-          return this.list;
-        },
-        handler: uikitUtil.noop,
-        ...pointerOptions }],
+        } }],
 
 
 
@@ -900,10 +731,10 @@
             this.prevIndex = this.index;
           }
 
-          uikitUtil.on(document, pointerMove, this.move, pointerOptions);
+          uikitUtil.on(document, uikitUtil.pointerMove, this.move, { passive: false });
 
           // 'input' event is triggered by video controls
-          uikitUtil.on(document, pointerUp, this.end, pointerOptions);
+          uikitUtil.on(document, uikitUtil.pointerUp + " " + uikitUtil.pointerCancel + " input", this.end, true);
 
           uikitUtil.css(this.list, 'userSelect', 'none');
         },
@@ -983,8 +814,8 @@
         },
 
         end() {
-          uikitUtil.off(document, pointerMove, this.move, pointerOptions);
-          uikitUtil.off(document, pointerUp, this.end, pointerOptions);
+          uikitUtil.off(document, uikitUtil.pointerMove, this.move, { passive: false });
+          uikitUtil.off(document, uikitUtil.pointerUp + " " + uikitUtil.pointerCancel + " input", this.end, true);
 
           if (this.dragging) {
             this.dragging = null;
@@ -1099,7 +930,7 @@
         } } };
 
     var Slider = {
-      mixins: [SliderAutoplay, SliderDrag, SliderNav, Resize],
+      mixins: [SliderAutoplay, SliderDrag, SliderNav],
 
       props: {
         clsActivated: Boolean,
@@ -1526,6 +1357,7 @@
           let matches;
           const iframeAttrs = {
             frameborder: '0',
+            allow: 'autoplay',
             allowfullscreen: '',
             style: 'max-width: 100%; box-sizing: border-box;',
             'uk-responsive': '',
@@ -1533,10 +1365,7 @@
 
 
           // Image
-          if (
-          type === 'image' ||
-          src.match(/\.(avif|jpe?g|jfif|a?png|gif|svg|webp)($|\?)/i))
-          {
+          if (type === 'image' || src.match(/\.(avif|jpe?g|a?png|gif|svg|webp)($|\?)/i)) {
             try {
               const { width, height } = await uikitUtil.getImage(src, attrs.srcset, attrs.size);
               this.setItem(item, createEl('img', { src, width, height, alt, ...attrs }));

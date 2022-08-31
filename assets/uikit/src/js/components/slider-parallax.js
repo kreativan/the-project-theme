@@ -8,12 +8,10 @@ export default {
         selItem: '!li',
     },
 
-    beforeConnect() {
-        this.item = query(this.selItem, this.$el);
-    },
-
-    disconnected() {
-        this.item = null;
+    computed: {
+        item({ selItem }, $el) {
+            return query(selItem, $el);
+        },
     },
 
     events: [

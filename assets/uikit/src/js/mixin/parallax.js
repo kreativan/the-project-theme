@@ -1,9 +1,9 @@
 import Media from '../mixin/media';
 import { getMaxPathLength } from '../core/svg';
 import {
-    createEvent,
     css,
     Dimensions,
+    each,
     findIndex,
     isNumber,
     isString,
@@ -47,17 +47,12 @@ export default {
 
     computed: {
         props(properties, $el) {
-            const stops = {};
-            for (const prop in properties) {
-                if (prop in props && !isUndefined(properties[prop])) {
-                    stops[prop] = properties[prop].slice();
+            return keys(props).reduce((result, prop) => {
+                if (!isUndefined(properties[prop])) {
+                    result[prop] = props[prop](prop, $el, properties[prop].slice());
                 }
-            }
-            const result = {};
-            for (const prop in stops) {
-                result[prop] = props[prop](prop, $el, stops[prop], stops);
-            }
-            return result;
+                return result;
+            }, {});
         },
     },
 
@@ -69,9 +64,7 @@ export default {
 
     methods: {
         reset() {
-            for (const prop in this.getCss(0)) {
-                css(this.$el, prop, '');
-            }
+            each(this.getCss(0), (_, prop) => css(this.$el, prop, ''));
         },
 
         getCss(percent) {
@@ -85,16 +78,12 @@ export default {
 };
 
 function transformFn(prop, el, stops) {
-    let unit = getUnit(stops) || { x: 'px', y: 'px', rotate: 'deg' }[prop] || '';
+    const unit = getUnit(stops) || { x: 'px', y: 'px', rotate: 'deg' }[prop] || '';
     let transformFn;
 
     if (prop === 'x' || prop === 'y') {
         prop = `translate${ucfirst(prop)}`;
         transformFn = (stop) => toFloat(toFloat(stop).toFixed(unit === 'px' ? 0 : 6));
-    } else if (prop === 'scale') {
-        unit = '';
-        transformFn = (stop) =>
-            getUnit([stop]) ? toPx(stop, 'width', el, true) / el.offsetWidth : stop;
     }
 
     if (stops.length === 1) {
@@ -186,66 +175,58 @@ function strokeFn(prop, el, stops) {
     };
 }
 
-function backgroundFn(prop, el, stops, props) {
+function backgroundFn(prop, el, stops) {
     if (stops.length === 1) {
         stops.unshift(0);
     }
 
-    const attr = prop === 'bgy' ? 'height' : 'width';
-    props[prop] = parseStops(stops, (stop) => toPx(stop, attr, el));
+    prop = prop.substr(-1);
+    const attr = prop === 'y' ? 'height' : 'width';
+    stops = parseStops(stops, (stop) => toPx(stop, attr, el));
 
-    const bgProps = ['bgx', 'bgy'].filter((prop) => prop in props);
-    if (bgProps.length === 2 && prop === 'bgx') {
-        return noop;
-    }
+    const bgPos = getCssValue(el, `background-position-${prop}`, '');
 
-    if (getCssValue(el, 'backgroundSize', '') === 'cover') {
-        return backgroundCoverFn(prop, el, stops, props);
-    }
-
-    const positions = {};
-    for (const prop of bgProps) {
-        positions[prop] = getBackgroundPos(el, prop);
-    }
-
-    return setBackgroundPosFn(bgProps, positions, props);
+    return getCssValue(el, 'backgroundSize', '') === 'cover'
+        ? backgroundCoverFn(prop, el, stops, bgPos, attr)
+        : setBackgroundPosFn(prop, stops, bgPos);
 }
 
-function backgroundCoverFn(prop, el, stops, props) {
+function backgroundCoverFn(prop, el, stops, bgPos, attr) {
     const dimImage = getBackgroundImageDimensions(el);
 
     if (!dimImage.width) {
         return noop;
     }
 
+    const values = stops.map(([value]) => value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const down = values.indexOf(min) < values.indexOf(max);
+
+    const diff = max - min;
+    let pos = (down ? -diff : 0) - (down ? min : max);
+
     const dimEl = {
         width: el.offsetWidth,
         height: el.offsetHeight,
     };
 
-    const bgProps = ['bgx', 'bgy'].filter((prop) => prop in props);
+    const baseDim = Dimensions.cover(dimImage, dimEl);
+    const span = baseDim[attr] - dimEl[attr];
 
-    const positions = {};
-    for (const prop of bgProps) {
-        const values = props[prop].map(([value]) => value);
-        const min = Math.min(...values);
-        const max = Math.max(...values);
-        const down = values.indexOf(min) < values.indexOf(max);
-        const diff = max - min;
+    if (span < diff) {
+        dimEl[attr] = baseDim[attr] + diff - span;
+    } else if (span > diff) {
+        const posPercentage = dimEl[attr] / toPx(bgPos, attr, el, true);
 
-        positions[prop] = `${(down ? -diff : 0) - (down ? min : max)}px`;
-        dimEl[prop === 'bgy' ? 'height' : 'width'] += diff;
+        if (posPercentage) {
+            pos -= (span - diff) / posPercentage;
+        }
     }
 
     const dim = Dimensions.cover(dimImage, dimEl);
 
-    for (const prop of bgProps) {
-        const attr = prop === 'bgy' ? 'height' : 'width';
-        const overflow = dim[attr] - dimEl[attr];
-        positions[prop] = `max(${getBackgroundPos(el, prop)},-${overflow}px) + ${positions[prop]}`;
-    }
-
-    const fn = setBackgroundPosFn(bgProps, positions, props);
+    const fn = setBackgroundPosFn(prop, stops, `${pos}px`);
     return (css, percent) => {
         fn(css, percent);
         css.backgroundSize = `${dim.width}px ${dim.height}px`;
@@ -253,16 +234,9 @@ function backgroundCoverFn(prop, el, stops, props) {
     };
 }
 
-function getBackgroundPos(el, prop) {
-    return getCssValue(el, `background-position-${prop.substr(-1)}`, '');
-}
-
-function setBackgroundPosFn(bgProps, positions, props) {
+function setBackgroundPosFn(prop, stops, pos) {
     return function (css, percent) {
-        for (const prop of bgProps) {
-            const value = getValue(props[prop], percent);
-            css[`background-position-${prop.substr(-1)}`] = `calc(${positions[prop]} + ${value}px)`;
-        }
+        css[`background-position-${prop}`] = `calc(${pos} + ${getValue(stops, percent)}px)`;
     };
 }
 
@@ -281,7 +255,7 @@ function getBackgroundImageDimensions(el) {
         if (!image.naturalWidth) {
             image.onload = () => {
                 dimensions[src] = toDimensions(image);
-                trigger(el, createEvent('load', false));
+                trigger(el, 'load');
             };
             return toDimensions(image);
         }
@@ -353,7 +327,7 @@ function getValue(stops, percent) {
     return isNumber(start) ? start + Math.abs(start - end) * p * (start < end ? 1 : -1) : +end;
 }
 
-const unitRe = /^-?\d+(\S*)/;
+const unitRe = /^-?\d+([^\s]*)/;
 function getUnit(stops, defaultUnit) {
     for (const stop of stops) {
         const match = stop.match?.(unitRe);

@@ -1,6 +1,5 @@
 import Margin from './margin';
 import Class from '../mixin/class';
-import Scroll from '../mixin/scroll';
 import {
     addClass,
     children,
@@ -15,7 +14,7 @@ import {
 export default {
     extends: Margin,
 
-    mixins: [Class, Scroll],
+    mixins: [Class],
 
     name: 'grid',
 
@@ -95,7 +94,7 @@ export default {
 
         {
             read() {
-                if (this.parallax && positionedAbsolute(this.$el)) {
+                if (positionedAbsolute(this.$el)) {
                     return false;
                 }
 

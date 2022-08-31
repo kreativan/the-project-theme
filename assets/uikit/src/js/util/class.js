@@ -10,9 +10,7 @@ export function removeClass(element, ...args) {
 }
 
 export function removeClasses(element, cls) {
-    attr(element, 'class', (value) =>
-        (value || '').replace(new RegExp(`\\b${cls}\\b\\s?`, 'g'), '')
-    );
+    attr(element, 'class', (value) => (value || '').replace(new RegExp(`\\b${cls}\\b`, 'g'), ''));
 }
 
 export function replaceClass(element, ...args) {
@@ -22,7 +20,12 @@ export function replaceClass(element, ...args) {
 
 export function hasClass(element, cls) {
     [cls] = getClasses(cls);
-    return !!cls && toNodes(element).some((node) => node.classList.contains(cls));
+    for (const node of toNodes(element)) {
+        if (cls && node.classList.contains(cls)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 export function toggleClass(element, cls, force) {

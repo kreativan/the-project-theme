@@ -133,6 +133,10 @@ export function toWindow(element) {
     return document?.defaultView || window;
 }
 
+export function toMs(time) {
+    return time ? (endsWith(time, 'ms') ? toFloat(time) : toFloat(time) * 1000) : 0;
+}
+
 export function isEqual(value, other) {
     return (
         value === other ||
@@ -200,44 +204,48 @@ export function pointInRect(point, rect) {
     );
 }
 
-function ratio(dimensions, prop, value) {
-    const aProp = prop === 'width' ? 'height' : 'width';
+export const Dimensions = {
+    ratio(dimensions, prop, value) {
+        const aProp = prop === 'width' ? 'height' : 'width';
 
-    return {
-        [aProp]: dimensions[prop]
-            ? Math.round((value * dimensions[aProp]) / dimensions[prop])
-            : dimensions[aProp],
-        [prop]: value,
-    };
-}
+        return {
+            [aProp]: dimensions[prop]
+                ? Math.round((value * dimensions[aProp]) / dimensions[prop])
+                : dimensions[aProp],
+            [prop]: value,
+        };
+    },
 
-function contain(dimensions, maxDimensions) {
-    dimensions = { ...dimensions };
+    contain(dimensions, maxDimensions) {
+        dimensions = { ...dimensions };
 
-    for (const prop in dimensions) {
-        dimensions =
-            dimensions[prop] > maxDimensions[prop]
-                ? ratio(dimensions, prop, maxDimensions[prop])
-                : dimensions;
-    }
+        each(
+            dimensions,
+            (_, prop) =>
+                (dimensions =
+                    dimensions[prop] > maxDimensions[prop]
+                        ? this.ratio(dimensions, prop, maxDimensions[prop])
+                        : dimensions)
+        );
 
-    return dimensions;
-}
+        return dimensions;
+    },
 
-function cover(dimensions, maxDimensions) {
-    dimensions = contain(dimensions, maxDimensions);
+    cover(dimensions, maxDimensions) {
+        dimensions = this.contain(dimensions, maxDimensions);
 
-    for (const prop in dimensions) {
-        dimensions =
-            dimensions[prop] < maxDimensions[prop]
-                ? ratio(dimensions, prop, maxDimensions[prop])
-                : dimensions;
-    }
+        each(
+            dimensions,
+            (_, prop) =>
+                (dimensions =
+                    dimensions[prop] < maxDimensions[prop]
+                        ? this.ratio(dimensions, prop, maxDimensions[prop])
+                        : dimensions)
+        );
 
-    return dimensions;
-}
-
-export const Dimensions = { ratio, contain, cover };
+        return dimensions;
+    },
+};
 
 export function getIndex(i, elements, current = 0, finite = false) {
     elements = toNodes(elements);

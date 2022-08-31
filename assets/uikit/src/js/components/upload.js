@@ -92,8 +92,6 @@ export default {
 
     methods: {
         async upload(files) {
-            files = toArray(files);
-
             if (!files.length) {
                 return;
             }
@@ -180,6 +178,7 @@ function match(pattern, path) {
 }
 
 function chunk(files, size) {
+    files = toArray(files);
     const chunks = [];
     for (let i = 0; i < files.length; i += size) {
         chunks.push(files.slice(i, i + size));

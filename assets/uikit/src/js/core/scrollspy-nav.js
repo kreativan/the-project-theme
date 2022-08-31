@@ -1,20 +1,19 @@
-import Scroll from '../mixin/scroll';
 import {
     $$,
+    addClass,
     closest,
+    escape,
+    getViewport,
+    getViewportClientHeight,
     hasClass,
     isVisible,
     offset,
-    offsetViewport,
+    removeClass,
     scrollParents,
-    toggleClass,
     trigger,
 } from 'uikit-util';
-import { getTargetElement } from './scroll';
 
 export default {
-    mixins: [Scroll],
-
     props: {
         cls: String,
         closest: String,
@@ -46,6 +45,10 @@ export default {
             immediate: true,
         },
 
+        targets() {
+            return $$(this.links.map((el) => escape(el.hash).substr(1)).join(','));
+        },
+
         elements({ closest: selector }) {
             return closest(this.links, selector || '*');
         },
@@ -54,29 +57,29 @@ export default {
     update: [
         {
             read() {
-                const targets = this.links.map(getTargetElement).filter(Boolean);
-
-                const { length } = targets;
+                const { length } = this.targets;
 
                 if (!length || !isVisible(this.$el)) {
                     return false;
                 }
 
-                const [scrollElement] = scrollParents(targets, /auto|scroll/, true);
+                const [scrollElement] = scrollParents(this.targets, /auto|scroll/, true);
                 const { scrollTop, scrollHeight } = scrollElement;
-                const viewport = offsetViewport(scrollElement);
-                const max = scrollHeight - viewport.height;
+                const max = scrollHeight - getViewportClientHeight(scrollElement);
                 let active = false;
 
                 if (scrollTop === max) {
                     active = length - 1;
                 } else {
-                    for (let i = 0; i < targets.length; i++) {
-                        if (offset(targets[i]).top - viewport.top - this.offset > 0) {
-                            break;
+                    this.targets.every((el, i) => {
+                        if (
+                            offset(el).top - offset(getViewport(scrollElement)).top - this.offset <=
+                            0
+                        ) {
+                            active = i;
+                            return true;
                         }
-                        active = +i;
-                    }
+                    });
 
                     if (active === false && this.overflow) {
                         active = 0;
@@ -90,9 +93,8 @@ export default {
                 const changed = active !== false && !hasClass(this.elements[active], this.cls);
 
                 this.links.forEach((el) => el.blur());
-                for (let i = 0; i < this.elements.length; i++) {
-                    toggleClass(this.elements[i], this.cls, +i === active);
-                }
+                removeClass(this.elements, this.cls);
+                addClass(this.elements[active], this.cls);
 
                 if (changed) {
                     trigger(this.$el, 'active', [active, this.elements[active]]);

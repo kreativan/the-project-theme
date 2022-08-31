@@ -6,10 +6,10 @@ import {
     attr,
     includes,
     isTag,
+    isVisible,
     isVoidElement,
     memoize,
     noop,
-    observeIntersection,
     once,
     remove,
     removeAttr,
@@ -59,24 +59,10 @@ export default {
                 }
 
                 this.applyAttributes(svg, el);
-
+                this.$emit();
                 return (this.svgEl = svg);
             }
         }, noop);
-
-        if (this.strokeAnimation) {
-            this.svg.then((el) => {
-                if (this._connected) {
-                    applyAnimation(el);
-                    this.registerObserver(
-                        observeIntersection(el, (records, observer) => {
-                            applyAnimation(el);
-                            observer.disconnect();
-                        })
-                    );
-                }
-            });
-        }
     },
 
     disconnected() {
@@ -94,6 +80,18 @@ export default {
         });
 
         this.svg = null;
+    },
+
+    update: {
+        read() {
+            return !!(this.strokeAnimation && this.svgEl && isVisible(this.svgEl));
+        },
+
+        write() {
+            applyAnimation(this.svgEl);
+        },
+
+        type: ['resize'],
     },
 
     methods: {

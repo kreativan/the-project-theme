@@ -5,17 +5,15 @@ import {
     includes,
     isRtl,
     isTouch,
-    noop,
     off,
     on,
+    pointerCancel,
+    pointerDown,
+    pointerMove,
+    pointerUp,
     selInput,
     trigger,
 } from 'uikit-util';
-
-const pointerOptions = { passive: false, capture: true };
-const pointerDown = 'touchstart mousedown';
-const pointerMove = 'touchmove mousemove';
-const pointerUp = 'touchend touchcancel mouseup click input';
 
 export default {
     props: {
@@ -71,16 +69,6 @@ export default {
                 e.preventDefault();
             },
         },
-
-        {
-            // iOS workaround for slider stopping if swiping fast
-            name: `${pointerMove} ${pointerUp}`,
-            el() {
-                return this.list;
-            },
-            handler: noop,
-            ...pointerOptions,
-        },
     ],
 
     methods: {
@@ -101,10 +89,10 @@ export default {
                 this.prevIndex = this.index;
             }
 
-            on(document, pointerMove, this.move, pointerOptions);
+            on(document, pointerMove, this.move, { passive: false });
 
             // 'input' event is triggered by video controls
-            on(document, pointerUp, this.end, pointerOptions);
+            on(document, `${pointerUp} ${pointerCancel} input`, this.end, true);
 
             css(this.list, 'userSelect', 'none');
         },
@@ -184,8 +172,8 @@ export default {
         },
 
         end() {
-            off(document, pointerMove, this.move, pointerOptions);
-            off(document, pointerUp, this.end, pointerOptions);
+            off(document, pointerMove, this.move, { passive: false });
+            off(document, `${pointerUp} ${pointerCancel} input`, this.end, true);
 
             if (this.dragging) {
                 this.dragging = null;

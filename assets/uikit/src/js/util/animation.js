@@ -4,8 +4,7 @@ import { css, propName } from './style';
 import { startsWith, toNodes } from './lang';
 import { addClass, hasClass, removeClass, removeClasses } from './class';
 
-function transition(element, props, duration = 400, timing = 'linear') {
-    duration = Math.round(duration);
+export function transition(element, props, duration = 400, timing = 'linear') {
     return Promise.all(
         toNodes(element).map(
             (element) =>
@@ -50,14 +49,13 @@ function transition(element, props, duration = 400, timing = 'linear') {
 export const Transition = {
     start: transition,
 
-    async stop(element) {
+    stop(element) {
         trigger(element, 'transitionend');
-        await Promise.resolve();
+        return Promise.resolve();
     },
 
-    async cancel(element) {
+    cancel(element) {
         trigger(element, 'transitioncanceled');
-        await Promise.resolve();
     },
 
     inProgress(element) {
@@ -67,7 +65,7 @@ export const Transition = {
 
 const animationPrefix = 'uk-animation-';
 
-function animate(element, animation, duration = 200, origin, out) {
+export function animate(element, animation, duration = 200, origin, out) {
     return Promise.all(
         toNodes(element).map(
             (element) =>
@@ -101,8 +99,7 @@ function animate(element, animation, duration = 200, origin, out) {
     );
 }
 
-const inProgressRe = new RegExp(`${animationPrefix}(enter|leave)`);
-
+const inProgress = new RegExp(`${animationPrefix}(enter|leave)`);
 export const Animation = {
     in: animate,
 
@@ -111,7 +108,7 @@ export const Animation = {
     },
 
     inProgress(element) {
-        return inProgressRe.test(attr(element, 'class'));
+        return inProgress.test(attr(element, 'class'));
     },
 
     cancel(element) {

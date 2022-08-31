@@ -8,8 +8,8 @@ import {
     isString,
     isUndefined,
     memoize,
-    startsWith,
     toNodes,
+    toWindow,
 } from './lang';
 
 const cssNumber = {
@@ -37,22 +37,21 @@ export function css(element, property, value, priority = '') {
             property = propName(property);
 
             if (isUndefined(value)) {
-                return getComputedStyle(element).getPropertyValue(property);
+                return getStyle(element, property);
+            } else if (!value && !isNumber(value)) {
+                element.style.removeProperty(property);
             } else {
                 element.style.setProperty(
                     property,
-                    isNumeric(value) && !cssNumber[property]
-                        ? `${value}px`
-                        : value || isNumber(value)
-                        ? value
-                        : '',
+                    isNumeric(value) && !cssNumber[property] ? `${value}px` : value,
                     priority
                 );
             }
         } else if (isArray(property)) {
+            const styles = getStyles(element);
             const props = {};
             for (const prop of property) {
-                props[prop] = css(element, prop);
+                props[prop] = styles[propName(prop)];
             }
             return props;
         } else if (isObject(property)) {
@@ -63,14 +62,27 @@ export function css(element, property, value, priority = '') {
     return elements[0];
 }
 
+function getStyles(element, pseudoElt) {
+    return toWindow(element).getComputedStyle(element, pseudoElt);
+}
+
+function getStyle(element, property, pseudoElt) {
+    return getStyles(element, pseudoElt)[property];
+}
+
+const propertyRe = /^\s*(["'])?(.*?)\1\s*$/;
+export function getCssVar(name) {
+    return getStyles(document.documentElement)
+        .getPropertyValue(`--uk-${name}`)
+        .replace(propertyRe, '$2');
+}
+
 // https://drafts.csswg.org/cssom/#dom-cssstyledeclaration-setproperty
 export const propName = memoize((name) => vendorPropName(name));
 
-function vendorPropName(name) {
-    if (startsWith(name, '--')) {
-        return name;
-    }
+const cssPrefixes = ['webkit', 'moz', 'ms'];
 
+function vendorPropName(name) {
     name = hyphenate(name);
 
     const { style } = document.documentElement;
@@ -79,8 +91,11 @@ function vendorPropName(name) {
         return name;
     }
 
-    for (const prefix of ['webkit', 'moz']) {
-        const prefixedName = `-${prefix}-${name}`;
+    let i = cssPrefixes.length,
+        prefixedName;
+
+    while (i--) {
+        prefixedName = `-${cssPrefixes[i]}-${name}`;
         if (prefixedName in style) {
             return prefixedName;
         }

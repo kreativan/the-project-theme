@@ -1,9 +1,8 @@
 import Class from '../mixin/class';
-import Resize from '../mixin/resize';
-import { closest, css, dimensions, height, isVisible } from 'uikit-util';
+import { closest, css, dimensions, height, isVisible, toFloat, trigger } from 'uikit-util';
 
 export default {
-    mixins: [Class, Resize],
+    mixins: [Class],
 
     props: {
         selContainer: String,
@@ -27,8 +26,8 @@ export default {
         },
     },
 
-    resizeTargets() {
-        return [this.container, this.content];
+    connected() {
+        css(this.$el, 'minHeight', this.minHeight);
     },
 
     update: {
@@ -38,6 +37,7 @@ export default {
             }
 
             return {
+                current: toFloat(css(this.$el, 'maxHeight')),
                 max: Math.max(
                     this.minHeight,
                     height(this.container) - (dimensions(this.content).height - height(this.$el))
@@ -45,8 +45,11 @@ export default {
             };
         },
 
-        write({ max }) {
-            css(this.$el, { minHeight: this.minHeight, maxHeight: max });
+        write({ current, max }) {
+            css(this.$el, 'maxHeight', max);
+            if (Math.round(current) !== Math.round(max)) {
+                trigger(this.$el, 'resize');
+            }
         },
 
         events: ['resize'],

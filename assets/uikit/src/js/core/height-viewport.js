@@ -1,21 +1,21 @@
-import Resize from '../mixin/resize';
+import Class from '../mixin/class';
 import {
     boxModelAdjust,
     css,
     dimensions,
     endsWith,
+    height,
     isNumeric,
     isString,
     isVisible,
-    offsetPosition,
-    offsetViewport,
+    offset,
     query,
-    scrollParents,
     toFloat,
+    trigger,
 } from 'uikit-util';
 
 export default {
-    mixins: [Resize],
+    mixins: [Class],
 
     props: {
         expand: Boolean,
@@ -31,11 +31,6 @@ export default {
         minHeight: 0,
     },
 
-    resizeTargets() {
-        // check for offsetTop change
-        return [this.$el, ...scrollParents(this.$el, /auto|scroll/)];
-    },
-
     update: {
         read({ minHeight: prev }) {
             if (!isVisible(this.$el)) {
@@ -45,33 +40,19 @@ export default {
             let minHeight = '';
             const box = boxModelAdjust(this.$el, 'height', 'content-box');
 
-            const { body, scrollingElement } = document;
-            const [scrollElement] = scrollParents(this.$el, /auto|scroll/);
-            const { height: viewportHeight } = offsetViewport(
-                scrollElement === body ? scrollingElement : scrollElement
-            );
-
             if (this.expand) {
-                minHeight = Math.max(
-                    viewportHeight -
-                        (dimensions(scrollElement).height - dimensions(this.$el).height) -
-                        box,
-                    0
-                );
+                minHeight =
+                    height(window) -
+                        (dimensions(document.documentElement).height -
+                            dimensions(this.$el).height) -
+                        box || '';
             } else {
-                const isScrollingElement =
-                    scrollingElement === scrollElement || body === scrollElement;
-
                 // on mobile devices (iOS and Android) window.innerHeight !== 100vh
-                minHeight = `calc(${isScrollingElement ? '100vh' : `${viewportHeight}px`}`;
+                minHeight = 'calc(100vh';
 
                 if (this.offsetTop) {
-                    if (isScrollingElement) {
-                        const top = offsetPosition(this.$el)[0] - offsetPosition(scrollElement)[0];
-                        minHeight += top > 0 && top < viewportHeight / 2 ? ` - ${top}px` : '';
-                    } else {
-                        minHeight += ` - ${css(scrollElement, 'paddingTop')}`;
-                    }
+                    const { top } = offset(this.$el);
+                    minHeight += top > 0 && top < height(window) / 2 ? ` - ${top}px` : '';
                 }
 
                 if (this.offsetBottom === true) {
@@ -90,8 +71,12 @@ export default {
             return { minHeight, prev };
         },
 
-        write({ minHeight }) {
+        write({ minHeight, prev }) {
             css(this.$el, { minHeight });
+
+            if (minHeight !== prev) {
+                trigger(this.$el, 'resize');
+            }
 
             if (this.minHeight && toFloat(css(this.$el, 'minHeight')) < this.minHeight) {
                 css(this.$el, 'minHeight', this.minHeight);

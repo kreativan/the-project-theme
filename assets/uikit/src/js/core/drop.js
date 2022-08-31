@@ -1,7 +1,6 @@
 import Container from '../mixin/container';
 import Lazyload from '../mixin/lazyload';
 import Position from '../mixin/position';
-import Style from '../mixin/style';
 import Togglable from '../mixin/togglable';
 import {
     addClass,
@@ -14,9 +13,7 @@ import {
     isTouch,
     matches,
     MouseTracker,
-    observeResize,
     offset,
-    offsetViewport,
     on,
     once,
     parent,
@@ -27,15 +24,14 @@ import {
     pointerUp,
     query,
     removeClass,
-    scrollParents,
+    toggleClass,
     within,
 } from 'uikit-util';
-import { preventBackgroundScroll, preventOverscroll } from '../mixin/modal';
 
 export let active;
 
 export default {
-    mixins: [Container, Lazyload, Position, Style, Togglable],
+    mixins: [Container, Lazyload, Position, Togglable],
 
     args: 'pos',
 
@@ -43,46 +39,36 @@ export default {
         mode: 'list',
         toggle: Boolean,
         boundary: Boolean,
-        target: Boolean,
-        targetX: Boolean,
-        targetY: Boolean,
-        stretch: Boolean,
+        boundaryAlign: Boolean,
         delayShow: Number,
         delayHide: Number,
-        autoUpdate: Boolean,
         clsDrop: String,
-        animateOut: Boolean,
-        bgScroll: Boolean,
     },
 
     data: {
         mode: ['click', 'hover'],
         toggle: '- *',
-        boundary: false,
-        target: false,
-        targetX: false,
-        targetY: false,
-        stretch: false,
+        boundary: true,
+        boundaryAlign: false,
         delayShow: 0,
         delayHide: 800,
-        autoUpdate: true,
         clsDrop: false,
-        animateOut: false,
-        bgScroll: true,
         animation: ['uk-animation-fade'],
         cls: 'uk-open',
         container: false,
     },
 
     computed: {
-        target({ target, targetX, targetY }, $el) {
-            targetX = targetX || target || this.targetEl;
-            targetY = targetY || target || this.targetEl;
+        boundary({ boundary }, $el) {
+            return boundary === true ? window : query(boundary, $el);
+        },
 
-            return [
-                targetX === true ? window : query(targetX, $el),
-                targetY === true ? window : query(targetY, $el),
-            ];
+        clsDrop({ clsDrop }) {
+            return clsDrop || `uk-${this.$options.name}`;
+        },
+
+        clsPos() {
+            return this.clsDrop;
         },
     },
 
@@ -90,26 +76,21 @@ export default {
         this.tracker = new MouseTracker();
     },
 
-    beforeConnect() {
-        this.clsDrop = this.$props.clsDrop || `uk-${this.$options.name}`;
-    },
-
     connected() {
         addClass(this.$el, this.clsDrop);
 
-        if (this.toggle && !this.targetEl) {
-            this.targetEl = this.$create('toggle', query(this.toggle, this.$el), {
+        if (this.toggle && !this.target) {
+            this.target = this.$create('toggle', query(this.toggle, this.$el), {
                 target: this.$el,
                 mode: this.mode,
             }).$el;
-            attr(this.targetEl, 'aria-haspopup', true);
-            this.lazyload(this.targetEl);
+            attr(this.target, 'aria-haspopup', true);
+            this.lazyload(this.target);
         }
     },
 
     disconnected() {
         if (this.isActive()) {
-            this.hide(false);
             active = null;
         }
     },
@@ -161,7 +142,7 @@ export default {
                 if (this.isToggled()) {
                     this.hide(false);
                 } else {
-                    this.show(toggle?.$el, false);
+                    this.show(toggle.$el, false);
                 }
             },
         },
@@ -173,7 +154,7 @@ export default {
 
             handler(e, toggle) {
                 e.preventDefault();
-                this.show(toggle?.$el);
+                this.show(toggle.$el);
             },
         },
 
@@ -243,8 +224,9 @@ export default {
 
                 this.tracker.init();
 
-                const update = () => this.$emit();
-                const handlers = [
+                once(
+                    this.$el,
+                    'hide',
                     on(
                         document,
                         pointerDown,
@@ -258,7 +240,7 @@ export default {
                                         !defaultPrevented &&
                                         type === pointerUp &&
                                         target === newTarget &&
-                                        !(this.targetEl && within(target, this.targetEl))
+                                        !(this.target && within(target, this.target))
                                     ) {
                                         this.hide(false);
                                     }
@@ -266,39 +248,19 @@ export default {
                                 true
                             )
                     ),
+                    { self: true }
+                );
 
+                once(
+                    this.$el,
+                    'hide',
                     on(document, 'keydown', (e) => {
                         if (e.keyCode === 27) {
                             this.hide(false);
                         }
                     }),
-
-                    on(window, 'resize', update),
-
-                    (() => {
-                        const observer = observeResize(
-                            scrollParents(this.$el).concat(this.target),
-                            update
-                        );
-                        return () => observer.disconnect();
-                    })(),
-
-                    ...(this.autoUpdate
-                        ? [
-                              on([document, scrollParents(this.$el)], 'scroll', update, {
-                                  passive: true,
-                              }),
-                          ]
-                        : []),
-
-                    ...(this.bgScroll
-                        ? []
-                        : [preventOverscroll(this.$el), preventBackgroundScroll()]),
-                ];
-
-                once(this.$el, 'hide', () => handlers.forEach((handler) => handler()), {
-                    self: true,
-                });
+                    { self: true }
+                );
             },
         },
 
@@ -336,15 +298,17 @@ export default {
                 this.position();
             }
         },
+
+        events: ['resize'],
     },
 
     methods: {
-        show(target = this.targetEl, delay = true) {
-            if (this.isToggled() && target && this.targetEl && target !== this.targetEl) {
-                this.hide(false, false);
+        show(target = this.target, delay = true) {
+            if (this.isToggled() && target && this.target && target !== this.target) {
+                this.hide(false);
             }
 
-            this.targetEl = target;
+            this.target = target;
 
             this.clearTimers();
 
@@ -361,7 +325,7 @@ export default {
                 let prev;
                 while (active && prev !== active && !within(this.$el, active.$el)) {
                     prev = active;
-                    active.hide(false, false);
+                    active.hide(false);
                 }
             }
 
@@ -375,8 +339,8 @@ export default {
             );
         },
 
-        hide(delay = true, animate = true) {
-            const hide = () => this.toggleElement(this.$el, false, this.animateOut && animate);
+        hide(delay = true) {
+            const hide = () => this.toggleElement(this.$el, false, false);
 
             this.clearTimers();
 
@@ -407,69 +371,27 @@ export default {
 
         position() {
             removeClass(this.$el, `${this.clsDrop}-stack`);
-            attr(this.$el, 'style', this._style);
+            toggleClass(this.$el, `${this.clsDrop}-boundary`, this.boundaryAlign);
 
-            // Ensure none positioned element does not generate scrollbars
-            this.$el.hidden = true;
+            const boundary = offset(this.boundary);
+            const alignTo = this.boundaryAlign ? boundary : offset(this.target);
 
-            const boundary = query(this.boundary, this.$el);
-            const boundaryOffset = offset(boundary || window);
-            const viewports = this.target.map((target) => offsetViewport(scrollParents(target)[0]));
-            const viewportOffset = this.getViewportOffset(this.$el);
-
-            const dirs = [
-                [0, ['x', 'width', 'left', 'right']],
-                [1, ['y', 'height', 'top', 'bottom']],
-            ];
-
-            for (const [i, [axis, prop]] of dirs) {
-                if (this.axis !== axis && includes([axis, true], this.stretch)) {
-                    css(this.$el, {
-                        [prop]: Math.min(
-                            boundaryOffset[prop],
-                            viewports[i][prop] - 2 * viewportOffset
-                        ),
-                        [`overflow-${axis}`]: 'auto',
-                    });
-                }
-            }
-
-            const maxWidth = viewports[0].width - 2 * viewportOffset;
-
-            if (this.$el.offsetWidth > maxWidth) {
+            if (this.align === 'justify') {
+                const prop = this.getAxis() === 'y' ? 'width' : 'height';
+                css(this.$el, prop, alignTo[prop]);
+            } else if (
+                this.boundary &&
+                this.$el.offsetWidth >
+                    Math.max(boundary.right - alignTo.left, alignTo.right - boundary.left)
+            ) {
                 addClass(this.$el, `${this.clsDrop}-stack`);
             }
 
-            css(this.$el, 'maxWidth', maxWidth);
-
-            this.$el.hidden = false;
-
-            this.positionAt(this.$el, this.target, boundary);
-
-            for (const [i, [axis, prop, start, end]] of dirs) {
-                if (this.axis === axis && includes([axis, true], this.stretch)) {
-                    const positionOffset = Math.abs(this.getPositionOffset(this.$el));
-                    const targetOffset = offset(this.target[i]);
-                    const elOffset = offset(this.$el);
-
-                    css(this.$el, {
-                        [prop]:
-                            (targetOffset[start] > elOffset[start]
-                                ? targetOffset[start] -
-                                  Math.max(
-                                      boundaryOffset[start],
-                                      viewports[i][start] + viewportOffset
-                                  )
-                                : Math.min(
-                                      boundaryOffset[end],
-                                      viewports[i][end] - viewportOffset
-                                  ) - targetOffset[end]) - positionOffset,
-                        [`overflow-${axis}`]: 'auto',
-                    });
-
-                    this.positionAt(this.$el, this.target, boundary);
-                }
-            }
+            this.positionAt(
+                this.$el,
+                this.boundaryAlign ? this.boundary : this.target,
+                this.boundary
+            );
         },
     },
 };

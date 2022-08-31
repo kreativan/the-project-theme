@@ -1,13 +1,4 @@
-import {
-    createEvent,
-    css,
-    isNumeric,
-    isString,
-    on,
-    startsWith,
-    toFloat,
-    trigger,
-} from 'uikit-util';
+import { getCssVar, isString, toFloat } from 'uikit-util';
 
 export default {
     props: {
@@ -18,36 +9,23 @@ export default {
         media: false,
     },
 
-    connected() {
-        const media = toMedia(this.media, this.$el);
-        this.matchMedia = true;
-        if (media) {
-            this.mediaObj = window.matchMedia(media);
-            const handler = () => {
-                this.matchMedia = this.mediaObj.matches;
-                trigger(this.$el, createEvent('mediachange', false, true, [this.mediaObj]));
-            };
-            this.offMediaObj = on(this.mediaObj, 'change', () => {
-                handler();
-                this.$emit('resize');
-            });
-            handler();
-        }
-    },
-
-    disconnected() {
-        this.offMediaObj?.();
+    computed: {
+        matchMedia() {
+            const media = toMedia(this.media);
+            return !media || window.matchMedia(media).matches;
+        },
     },
 };
 
-function toMedia(value, element) {
+function toMedia(value) {
     if (isString(value)) {
-        if (startsWith(value, '@')) {
-            value = toFloat(css(element, `--uk-breakpoint-${value.substr(1)}`));
+        if (value[0] === '@') {
+            const name = `breakpoint-${value.substr(1)}`;
+            value = toFloat(getCssVar(name));
         } else if (isNaN(value)) {
             return value;
         }
     }
 
-    return value && isNumeric(value) ? `(min-width: ${value}px)` : '';
+    return value && !isNaN(value) ? `(min-width: ${value}px)` : false;
 }
