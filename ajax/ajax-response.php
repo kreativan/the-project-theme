@@ -39,6 +39,8 @@ $response = [
   "post" => $_POST,
   // Log $_GET data
   "get" => $_GET,
+  // log request data
+  "REQUEST" => $_REQUEST,
 ];
 
 header('Content-type: application/json');

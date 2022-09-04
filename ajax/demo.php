@@ -6,6 +6,7 @@ $response = [
   "status" => "success",
   "notification" => "Ajax request was ok!",
   "file" => $path,
+  "REQUEST" => $_REQUEST,
 ];
 
 header('Content-type: application/json');

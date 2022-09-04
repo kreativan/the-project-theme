@@ -47,7 +47,15 @@
         Offcanvas
       </button>
 
-      <button class="uk-button uk-button-default" onclick="the_project.ajaxReq('/ajax/demo/')">
+      <?php
+        $ajax_data = [
+          'indicator' => "#htmx-indicator",
+          'title' => get_the_title(),
+        ];
+      ?>
+      <button class="uk-button uk-button-default uk-margin-left tm-bg-white" 
+        onclick='the_project.ajaxReq("/ajax/demo/", <?=  json_encode($ajax_data) ?>)'
+      >
         Ajax REQ
       </button>
 
