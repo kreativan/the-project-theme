@@ -25,6 +25,7 @@ $js_files = [
   get_template_directory_uri() . "/assets/uikit/dist/js/uikit-icons.min.js",
   get_template_directory_uri() . "/assets/uikit/dist/js/components/notification.min.js",
   get_template_directory_uri() . "/assets/uikit/dist/js/components/slideshow.min.js",
+  get_template_directory_uri() . "/assets/uikit/dist/js/components/tooltip.min.js",
 ];
 
 // js vars

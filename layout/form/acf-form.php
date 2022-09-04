@@ -46,16 +46,15 @@ $captcha = get_field('captcha', $id);
           uk-tooltip='pos: top-left'
           <?php endif; ?>
         >
+          <?php if(!empty($field['description']) && $field['show_description']) : ?>
+          <span uk-icon="info"></span>
+          <?php endif; ?>
 
-            <?php if(!empty($field['description']) && $field['show_description']) : ?>
-              <span uk-icon="info"></span>
-            <?php endif; ?>
-
-            <?= $field['label'] ?>
+          <?= $field['label'] ?>
      
-            <?php if($field['required']) : ?>
-              <span class="uk-text-danger">*</span>
-            <?php endif; ?>
+          <?php if($field['required']) : ?>
+          <span class="uk-text-danger">*</span>
+          <?php endif; ?>
             
         </label>
         <?php endif; ?>
