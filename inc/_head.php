@@ -6,11 +6,20 @@ $lessCompiler = new Less_Compiler;
 $dev_mode = the_project('dev_mode') == '1' ? true : false;
 $assets_suffix = the_project('assets_suffix');
 
-// Less files
+/**
+ * Less File - array of file paths
+ * All files in this array will be passed to the compiler.
+ * Include your less files here
+ */
 $less_files = [
   get_template_directory() . "/less/import.less"
 ];
 
+/**
+ * Less variables 
+ * Set and override less variables here
+ * @example ['global-primary-color' => 'blue']
+ */
 $less_vars = [
   "global-font-family" => "'Roboto Flex', sans-serif",
   "base-heading-font-family" => "'Roboto Flex', sans-serif",
@@ -19,7 +28,10 @@ $less_vars = [
 // Google Fonts LInk
 $google_fonts_link = "https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,700&display=swap";
 
-// js_files
+/**
+ * JS Files
+ * Include your js files here
+ */
 $js_files = [
   get_template_directory_uri() . "/assets/uikit/dist/js/uikit-core.min.js",
   get_template_directory_uri() . "/assets/uikit/dist/js/uikit-icons.min.js",
@@ -28,9 +40,13 @@ $js_files = [
   get_template_directory_uri() . "/assets/uikit/dist/js/components/tooltip.min.js",
 ];
 
-// js vars
+/**
+ * JS Vars
+ * @example console.log(cms.debug)
+ */
 $js_vars = [
   "debug" => $dev_mode ? true : false,
+  'mobile_menu_path' => '/htmx/layout/menu/mobile-menu/',
 ];
 
 ?>

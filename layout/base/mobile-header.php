@@ -20,7 +20,7 @@ uk-sticky="show-on-up: true; animation: uk-animation-slide-top">
   <button 
     type="button" 
     class="mobile-menu-button uk-icon uk-position-center-left" 
-    onclick="mobile_menu('<?= $actual_link ?>')"
+    onclick="theProject.mobile_menu('<?= $actual_link ?>')"
     title=""
   >
     <i uk-icon="icon: menu; ratio: 1.5;"></i>
