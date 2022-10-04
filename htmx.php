@@ -16,7 +16,7 @@
       <?= the_content() ?>
     
       <button type="button" class="uk-button uk-button-primary"
-        hx-post="/htmx/layout/htmx-examples/test/"
+        hx-post="./?htmx=layout/htmx-examples/test"
         hx-target="#target"
         hx-swap="outerHTML"
         hx-indicator="#htmx-indicator"
@@ -26,7 +26,7 @@
       </button>
 
       <button type="button" class="uk-button uk-button-default uk-margin-left tm-bg-white"
-        hx-get="/htmx/layout/htmx-examples/modal/"
+        hx-get="./?htmx=layout/htmx-examples/modal"
         hx-target="body"
         hx-swap="beforeend"
         hx-indicator="#htmx-indicator"
@@ -37,7 +37,7 @@
       </button>
 
       <button type="button" class="uk-button uk-button-default uk-margin-left tm-bg-white"
-        hx-get="/htmx/layout/htmx-examples/offcanvas/"
+        hx-get="./?htmx=layout/htmx-examples/offcanvas"
         hx-target="body"
         hx-swap="beforeend"
         hx-indicator="#htmx-indicator"

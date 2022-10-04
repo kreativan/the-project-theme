@@ -1,4 +1,14 @@
 <?php
+/**
+ * Render layout file on htmx request
+ * @example ./?htmx=layout/home/hero
+ */
+if(get_htmx_file()) {
+  $layout = get_htmx_file();
+  get_template_part($layout, null);
+  exit();
+}
+
 // Less compiler
 $lessCompiler = new Less_Compiler;
 
@@ -52,7 +62,7 @@ $js_files = [
  */
 $js_vars = [
   "debug" => $dev_mode ? true : false,
-  'mobile_menu_path' => '/htmx/layout/menu/mobile-menu/',
+  'mobile_menu_path' => './?htmx=layout/menu/mobile-menu',
 ];
 
 ?>

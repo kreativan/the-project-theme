@@ -1,4 +1,4 @@
-<?php
+<?php 
 $hero_title = get_field('hero_title');
 $hero_subtitle = get_field('hero_subtitle');
 $hero_text = get_field('hero_text');

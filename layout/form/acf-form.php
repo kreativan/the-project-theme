@@ -81,7 +81,6 @@ $captcha = get_field('captcha', $id);
         <?php elseif($field['acf_fc_layout'] == 'textarea') : ?>
           <?php
             get_template_part('/layout/input/textarea', null, [
-              'type' => 'email',
               'name' => $name,
               'placeholder' => $placeholder,
               'rows' => 5,
