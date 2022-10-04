@@ -7,7 +7,7 @@ $form = get_post($id);
 $form_fields = get_field('form_fields', $id);
 
 $action = get_field('action_url', $id);
-$action = !empty($action) ? $action : "/ajax/acf-form/";
+$action = !empty($action) ? $action : "./";
 
 $captcha = get_field('captcha', $id);
 
@@ -23,6 +23,7 @@ $captcha = get_field('captcha', $id);
 
   <input type="hidden" name="nonce" value="<?= wp_create_nonce('ajax-nonce') ?>" />
   <input type="hidden" name="form_id" value="<?= $id ?>" />
+  <input type="hidden" name="the_project_acf_form" value="<?= $id ?>" />
 
   <div class="uk-grid" uk-grid>
     <?php foreach($form_fields as $field) : ?>
@@ -123,7 +124,7 @@ $captcha = get_field('captcha', $id);
   <?php endif;?>
 
   <div class="uk-margin-top">
-    <button type="button" class="uk-button uk-button-<?= $button_style ?>" onclick="the_project.formSubmit('form-<?= $form->post_name ?>')">
+    <button type="button" class="uk-button uk-button-<?= $button_style ?>" onclick="project.formSubmit('form-<?= $form->post_name ?>')">
       <?= get_field('submit_button_text', $id) ?>
     </button>
     <span class="ajax-indicator uk-hidden uk-margin-left" uk-spinner></span>

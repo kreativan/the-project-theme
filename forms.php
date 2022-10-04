@@ -18,7 +18,8 @@ $query = new WP_Query($args);
       <div class="tm-border uk-padding uk-margin-medium uk-background-muted">
         <h2><?= the_title(); ?></h2>
         <?php
-          get_template_part('layout/form/acf-form', null, ['id' => $post->ID]); 
+          // get_template_part('layout/form/acf-form', null, ['id' => $post->ID]); 
+          the_project_form($post->ID);
         ?>
       </div>
     <?php endwhile;?>

@@ -12,7 +12,13 @@ $assets_suffix = the_project('assets_suffix');
  * Include your less files here
  */
 $less_files = [
-  get_template_directory() . "/less/import.less"
+  get_template_directory() . "/lib/uikit/src/less/uikit.theme.less",
+  get_template_directory() . "/lib/less/mixins.less",
+  get_template_directory() . "/lib/less/wp.less",
+  get_template_directory() . "/lib/less/utility.less",
+  get_template_directory() . "/lib/less/svg.less",
+  get_template_directory() . "/style/vars.less",
+  get_template_directory() . "/style/style.less",
 ];
 
 /**
@@ -33,11 +39,11 @@ $google_fonts_link = "https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,
  * Include your js files here
  */
 $js_files = [
-  get_template_directory_uri() . "/assets/uikit/dist/js/uikit-core.min.js",
-  get_template_directory_uri() . "/assets/uikit/dist/js/uikit-icons.min.js",
-  get_template_directory_uri() . "/assets/uikit/dist/js/components/notification.min.js",
-  get_template_directory_uri() . "/assets/uikit/dist/js/components/slideshow.min.js",
-  get_template_directory_uri() . "/assets/uikit/dist/js/components/tooltip.min.js",
+  get_template_directory_uri() . "/lib/uikit/dist/js/uikit-core.min.js",
+  get_template_directory_uri() . "/lib/uikit/dist/js/uikit-icons.min.js",
+  get_template_directory_uri() . "/lib/uikit/dist/js/components/notification.min.js",
+  get_template_directory_uri() . "/lib/uikit/dist/js/components/slideshow.min.js",
+  get_template_directory_uri() . "/lib/uikit/dist/js/components/tooltip.min.js",
 ];
 
 /**

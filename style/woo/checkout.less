@@ -2,6 +2,43 @@
   WooCommerce: Checkout
 =========================================================== */
 
+.woocommerce-invalid {
+  input, select, textarea {
+    border-color: @global-danger-background !important;
+  }
+}
+
+/**
+ *  Select 
+ */
+.state_select,
+.country_select  {
+  .uk-select();
+  height: @global-control-height;
+}
+
+/**
+ *  Country select
+ */
+.select2-selection__arrow,
+.select2-container .select2-selection--single {
+  height: @global-control-height !important;
+  border-radius: 0 !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: @global-control-height !important;
+}
+.select2-dropdown,
+.select2-container--default .select2-selection--single {
+  border-color: @global-border !important;
+}
+.select2-dropdown {
+  .uk-box-shadow-medium();
+}
+
+/**
+ *  Checkout
+ */
 .woocommerce-checkout {
 
   label {
@@ -63,6 +100,9 @@
 
 }
 
+/**
+ *  Coupon
+ */
 .checkout_coupon {
   
   background: @global-muted-background;
@@ -80,6 +120,9 @@
 
 }
 
+/**
+ *  Payment
+ */
 .woocommerce-checkout-payment {
 
   margin-top: @global-margin;
@@ -92,6 +135,9 @@
 
 }
 
+/**
+ *  terms & conditions
+ */
 .woocommerce-terms-and-conditions-wrapper {
 
   margin: @global-margin 0;
@@ -108,4 +154,68 @@
     background: @button-primary-hover-background;
     color: @button-primary-hover-color;
   }
+}
+
+/**
+ *  Billing fields
+ */
+ 
+.woocommerce-billing-fields__field-wrapper {
+
+  & > p:not(:last-child) {
+    margin-bottom: 15px !important;
+  }
+
+  @media(min-width: @breakpoint-large) {
+    #billing_postcode_field,
+    #billing_state_field,
+    #billing_city_field,
+    #billing_first_name_field,
+    #billing_last_name_field,
+    #billing_company_field {
+      width:32%;
+    }
+
+    #billing_phone_field,
+    #billing_email_field,
+    #billing_address_2_field,
+    #billing_address_1_field {
+      width: 49%;
+    }
+
+    #billing_email_field,
+    #billing_postcode_field,
+    #billing_address_2_field,
+    #billing_company_field {
+      margin-left: auto;
+    }
+
+    #billing_state_field {
+      margin-left: auto;
+    }
+  }
+
+}
+
+
+/**
+ *  Order review
+ */
+#order_review {
+
+  #shipping_method {
+    margin:0;
+  }
+
+  #shipping_method > li {
+    display:flex;
+    align-items: center;
+    input {
+      margin-right:10px;
+    }
+    label {
+      margin: 0;
+    }
+  }
+
 }

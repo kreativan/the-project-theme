@@ -31,7 +31,7 @@
         hx-swap="beforeend"
         hx-indicator="#htmx-indicator"
         hx-vals='<?= json_encode(['title' => 'Modal']) ?>'
-        onclick="the_project.htmxModal()"
+        onclick="project.htmxModal()"
       >
         Modal
       </button>
@@ -42,7 +42,7 @@
         hx-swap="beforeend"
         hx-indicator="#htmx-indicator"
         hx-vals='<?= json_encode(['title' => 'Title']) ?>'
-        onclick="the_project.htmxOffcanvas()"
+        onclick="project.htmxOffcanvas()"
       >
         Offcanvas
       </button>
@@ -54,7 +54,7 @@
         ];
       ?>
       <button class="uk-button uk-button-default uk-margin-left tm-bg-white" 
-        onclick='the_project.ajaxReq("/ajax/demo/", <?=  json_encode($ajax_data) ?>)'
+        onclick='project.ajaxReq("/ajax/demo/", <?=  json_encode($ajax_data) ?>)'
       >
         Ajax REQ
       </button>

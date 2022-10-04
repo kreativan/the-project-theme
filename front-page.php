@@ -15,7 +15,7 @@
   </div>
 
   <?php 
-    get_template_part('layout/page-builder');
+    get_template_part('layout/page-builder/default');
   ?>
 
 </div>

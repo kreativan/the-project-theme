@@ -1,0 +1,24 @@
+/* =========================================================== 
+  WooCommerce
+=========================================================== */
+
+.input-text {
+  &.qty {
+    max-width: 80px;
+  }
+}
+
+.button:not(.uk-button) {
+
+  .uk-button();
+  .uk-button-default();
+
+  &:active, 
+  &:focus, 
+  &:hover {
+    cursor: pointer;
+    background-color: @button-default-hover-background;
+    color: @button-default-hover-color;
+  }
+
+}
