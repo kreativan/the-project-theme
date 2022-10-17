@@ -4,7 +4,9 @@
  */
 ?>
 
-<?php get_header(); ?>
+<?php get_header(); 
+
+?>
 
 <?php get_template_part("layout/home/hero"); ?>
 
@@ -15,7 +17,7 @@
   </div>
 
   <?php 
-    get_template_part('layout/page-builder/default');
+    get_template_part('inc/page-builder');
   ?>
 
 </div>

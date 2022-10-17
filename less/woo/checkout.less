@@ -1,0 +1,141 @@
+/* =========================================================== 
+  WooCommerce: Checkout
+=========================================================== */
+
+.woocommerce-invalid {
+  input, select, textarea {
+    border-color: @global-danger-background !important;
+  }
+}
+
+/**
+ *  Select 
+ */
+.state_select,
+.country_select  {
+  .uk-select();
+  height: @global-control-height;
+}
+
+/**
+ *  Country select
+ */
+.select2-selection__arrow,
+.select2-container .select2-selection--single {
+  height: @global-control-height !important;
+  border-radius: 0 !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: @global-control-height !important;
+}
+.select2-dropdown,
+.select2-container--default .select2-selection--single {
+  border-color: @global-border !important;
+}
+.select2-dropdown {
+  .uk-box-shadow-medium();
+}
+
+/**
+ *  Checkout
+ */
+.woocommerce-checkout {
+
+  label {
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  th {
+    text-align: left;
+    padding-left: @global-small-gutter;
+  }
+  
+}
+
+/**
+ *  Coupon
+ */
+.checkout_coupon {
+  
+  .form-row-last {
+    margin-bottom:0;
+  }
+
+  .button {
+    background: white;
+    border: 1px solid @global-border;
+  }
+
+}
+
+/**
+ *  Payment
+ */
+.woocommerce-checkout-payment {
+
+  margin-top: @global-margin;
+
+  .wc_payment_methods {
+    .uk-list();
+  }
+
+}
+
+/**
+ *  terms & conditions
+ */
+.woocommerce-terms-and-conditions-wrapper {
+
+  margin: @global-margin 0;
+  font-size: 0.85rem;
+
+}
+
+.button[name=woocommerce_checkout_place_order] {
+  .uk-button-primary();
+  .uk-button-large();
+  &:hover,
+  &:focus,
+  &:active  {
+    background: @button-primary-hover-background;
+    color: @button-primary-hover-color;
+  }
+}
+
+/**
+ *  Order review
+ */
+#order_review {
+
+  #shipping_method {
+    .uk-list();
+    margin:0;
+    * {
+      font-size: 1rem;
+    }
+  }
+
+  tr {
+    border: none;
+    border-bottom: 1px solid @global-border;
+  }
+
+  th, td {
+    padding: 10px @global-gutter;
+  }
+
+  #shipping_method > li {
+
+    display:flex;
+    align-items: center;
+   
+    input {
+      margin:0 10px 0 0;
+    }
+    label {
+      margin: 0;
+    }
+  }
+
+}

@@ -1,0 +1,60 @@
+{
+    "key": "group_634809a991f82",
+    "title": "WooCommerce Page",
+    "fields": [
+        {
+            "key": "field_634809aa2b901",
+            "label": "Page",
+            "name": "page",
+            "type": "radio",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "custom": "Custom",
+                "woocommerce_cart": "Cart",
+                "woocommerce_checkout": "Checkout",
+                "woocommerce_my_account": "My Account"
+            },
+            "default_value": "custom",
+            "return_format": "value",
+            "allow_null": 0,
+            "other_choice": 0,
+            "layout": "horizontal",
+            "save_other_choice": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_template",
+                "operator": "==",
+                "value": "woo-page.php"
+            }
+        ],
+        [
+            {
+                "param": "post_template",
+                "operator": "==",
+                "value": "woo-page.php"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "acf_after_title",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": [
+        "the_content"
+    ],
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1665666729
+}

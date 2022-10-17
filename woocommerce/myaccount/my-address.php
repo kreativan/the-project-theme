@@ -40,6 +40,8 @@ if ( ! wc_ship_to_billing_address_only() && wc_shipping_enabled() ) {
 
 $oldcol = 1;
 $col    = 1;
+
+$i = 0;
 ?>
 
 <p class="uk-alert uk-alert-primary">
@@ -57,12 +59,14 @@ $col    = 1;
 		$oldcol  = $oldcol * -1;
 	?>
 
-	<div class="u-column<?php echo $col < 0 ? 1 : 2; ?> col-<?php echo $oldcol < 0 ? 1 : 2; ?> woocommerce-Address uk-background-muted uk-padding uk-margin">
+  <?php if($i++ > 0) echo "<hr />"; ?>
+  
+	<div class="u-column<?php echo $col < 0 ? 1 : 2; ?> col-<?php echo $oldcol < 0 ? 1 : 2; ?> woocommerce-Address uk-margin">
 		<header class="woocommerce-Address-title title">
 			<h3><?php echo esc_html( $address_title ); ?></h3>
 			<a class="uk-button uk-button-primary uk-button-small" href="<?php echo esc_url( wc_get_endpoint_url( 'edit-address', $name ) ); ?>" class="edit"><?php echo $address ? esc_html__( 'Edit', 'woocommerce' ) : esc_html__( 'Add', 'woocommerce' ); ?></a>
 		</header>
-		<address class="uk-text-warning uk-margin-remove-bottom">
+		<address class="uk-text-muted uk-text-small uk-margin-remove-bottom">
 			<?php
 				echo $address ? wp_kses_post( $address ) : esc_html_e( 'You have not set up this type of address yet.', 'woocommerce' );
 			?>

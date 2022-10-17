@@ -1,14 +1,4 @@
 <?php
-/**
- * Render layout file on htmx request
- * @example ./?htmx=layout/home/hero
- */
-if(get_htmx_file()) {
-  $layout = get_htmx_file();
-  get_template_part($layout, null);
-  exit();
-}
-
 // Less compiler
 $lessCompiler = new Less_Compiler;
 
@@ -22,39 +12,40 @@ $assets_suffix = the_project('assets_suffix');
  * Include your less files here
  */
 $less_files = [
-  get_template_directory() . "/lib/uikit/src/less/uikit.theme.less",
-  get_template_directory() . "/lib/less/mixins.less",
-  get_template_directory() . "/lib/less/wp.less",
-  get_template_directory() . "/lib/less/utility.less",
-  get_template_directory() . "/lib/less/svg.less",
-  get_template_directory() . "/style/vars.less",
-  get_template_directory() . "/style/style.less",
+  the_project_dir() . "/lib/uikit/src/less/uikit.theme.less",
+  the_project_dir() . "/lib/less/mixins.less",
+  the_project_dir() . "/lib/less/wp.less",
+  the_project_dir() . "/lib/less/utility.less",
+  the_project_dir() . "/lib/less/svg.less",
 ];
+
+if(isset($args["less_files"])) {
+  $less_files = array_merge($less_files, $args["less_files"]);
+}
 
 /**
  * Less variables 
  * Set and override less variables here
  * @example ['global-primary-color' => 'blue']
  */
-$less_vars = [
-  "global-font-family" => "'Roboto Flex', sans-serif",
-  "base-heading-font-family" => "'Roboto Flex', sans-serif",
-];
+$less_vars = [];
+if(isset($args["less_vars"])) $less_vars = $args["less_vars"];
 
 // Google Fonts LInk
-$google_fonts_link = "https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,700&display=swap";
+$google_fonts_link = isset($args['google_fonts_link']) ? $args['google_fonts_link'] : "";
 
 /**
  * JS Files
  * Include your js files here
  */
 $js_files = [
-  get_template_directory_uri() . "/lib/uikit/dist/js/uikit-core.min.js",
-  get_template_directory_uri() . "/lib/uikit/dist/js/uikit-icons.min.js",
-  get_template_directory_uri() . "/lib/uikit/dist/js/components/notification.min.js",
-  get_template_directory_uri() . "/lib/uikit/dist/js/components/slideshow.min.js",
-  get_template_directory_uri() . "/lib/uikit/dist/js/components/tooltip.min.js",
+  the_project_url() . "lib/uikit/dist/js/uikit-core.min.js",
+  the_project_url() . "lib/uikit/dist/js/uikit-icons.min.js",
 ];
+
+if(isset($args["js_files"])) {
+  $js_files = array_merge($js_files, $args["js_files"]);
+}
 
 /**
  * JS Vars
@@ -63,15 +54,23 @@ $js_files = [
 $js_vars = [
   "debug" => $dev_mode ? true : false,
   'mobile_menu_path' => './?htmx=layout/menu/mobile-menu',
+  "ajaxUrl" => '/ajax/',
+  "REST" => '/wp-json/project/',
 ];
+
+if(isset($args["js_vars"])) {
+  $js_vars = array_merge($js_vars, $args["js_vars"]);
+}
 
 ?>
 
+<?php if($google_fonts_link && $google_fonts_link != "") : ?>
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="<?= $google_fonts_link ?>">
 <link href="<?= $google_fonts_link ?>" rel="stylesheet"> 
+<?php endif;?>
 
 <!-- preload -->
 <?php if(!$dev_mode) :?>
@@ -90,3 +89,8 @@ $js_vars = [
   const cms = <?= json_encode($js_vars) ?>;
   console.log(cms);
 </script>
+
+<?php
+do_action("tpf_head");
+?>
+

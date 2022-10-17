@@ -25,10 +25,10 @@ if($is_bg) {
   <div class="uk-overlay uk-overlay-default uk-position-cover"></div>
   <?php endif; ?>
 
-  <div class="uk-container uk-position-relative">
+  <div class="uk-container uk-position-relative uk-text-center">
 
     <?php if(!empty($hero_title)) :?>
-    <h1 class="uk-heading-large uk-text-bold uk-margin-remove">
+    <h1 class="uk-heading-medium uk-text-bold uk-margin-remove">
       <?= $hero_title ?>
     </h1>
     <?php endif; ?>
@@ -38,7 +38,7 @@ if($is_bg) {
     <?php endif; ?>
 
     <?php if(!empty($hero_text)) :?>
-    <p class="uk-width-2-3@l"><?= $hero_text ?></p>
+    <p class="uk-width-2-3@l uk-margin-auto"><?= $hero_text ?></p>
     <?php endif;?>
 
   </div>

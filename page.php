@@ -4,11 +4,9 @@
   <div uk-height-viewport="expand: true">
 
     <h1><?php the_title(); ?></h1>
-    
-    <?php the_content(); ?>
 
     <?php
-      if(is_shop()) get_template_part("layout/wp/content");
+      get_template_part("layout/wp/content");
     ?>
 
   </div>

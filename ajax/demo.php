@@ -5,7 +5,7 @@ $path = "/ajax/$url[2].php";
 $response = [
   "status" => "success",
   "notification" => "Ajax request was ok!",
-  "file" => $path,
+  "file" => __FILE__,
   "REQUEST" => $_REQUEST,
 ];
 

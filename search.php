@@ -18,7 +18,7 @@
 
   <?php 
     get_template_part('layout/common/search-results'); 
-    get_template_part('layout/common/pagination', null);
+    get_template_part('layout/common/pagination');
   ?>
 
 </div>

@@ -51,3 +51,7 @@ add_filter( 'pre_get_document_title', function( $title ) {
 <?php
 echo "\n";
 ?>
+
+<?php
+do_action("tpf_meta");
+?>

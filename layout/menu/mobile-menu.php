@@ -1,5 +1,5 @@
 <?php
-$mobile_menu = the_project_menu('navbar');
+$mobile_menu = tpf_menu('Main Menu');
 
 if(isset($_GET['actual_link'])) {
   $actual_link = $_GET['actual_link'];

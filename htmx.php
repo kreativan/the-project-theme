@@ -26,23 +26,13 @@
       </button>
 
       <button type="button" class="uk-button uk-button-default uk-margin-left tm-bg-white"
-        hx-get="./?htmx=layout/htmx-examples/modal"
-        hx-target="body"
-        hx-swap="beforeend"
-        hx-indicator="#htmx-indicator"
-        hx-vals='<?= json_encode(['title' => 'Modal']) ?>'
-        onclick="project.htmxModal()"
+        <?= htmx_modal('layout/htmx-examples/modal.php', ['title' => 'Modal']) ?>
       >
         Modal
       </button>
 
       <button type="button" class="uk-button uk-button-default uk-margin-left tm-bg-white"
-        hx-get="./?htmx=layout/htmx-examples/offcanvas"
-        hx-target="body"
-        hx-swap="beforeend"
-        hx-indicator="#htmx-indicator"
-        hx-vals='<?= json_encode(['title' => 'Title']) ?>'
-        onclick="project.htmxOffcanvas()"
+        <?= htmx_offcanvas('layout/htmx-examples/offcanvas.php', ['title' => 'Title']) ?>
       >
         Offcanvas
       </button>

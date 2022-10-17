@@ -28,7 +28,8 @@ $allowed_html = array(
 );
 ?>
 
-<h3>
+<!--
+<p>
 	<?php
 	printf(
 		/* translators: 1: user display name 2: logout url */
@@ -37,8 +38,42 @@ $allowed_html = array(
 		esc_url( wc_logout_url() )
 	);
 	?>
-</h3>
+</p>
+-->
 
+<!--
+<h3>
+  <?= sprintf(__("Hello %s"), $current_user->display_name) ?>
+</h3>
+-->
+
+<ul class="uk-list uk-list-divider">
+  <li>
+    <a href="<?= esc_url( wc_get_endpoint_url( 'orders' ) ) ?>">
+      <?= __('Recent orders') ?>
+    </a>
+  </li>
+  <?php if(wc_shipping_enabled()) : ?>
+  <li>
+    <a href="<?= esc_url( wc_get_endpoint_url( 'edit-address' ) ) ?>">
+      <?= __('Shipping and billing addresses') ?>
+    </a>
+  </li>
+  <?php else : ?>
+  <li>
+    <a href="<?= esc_url( wc_get_endpoint_url( 'edit-address' ) ) ?>">
+      <?= __('Billing address') ?>
+    </a>
+  </li>
+  <?php endif;?>
+  <li>
+    <a href="<?= esc_url( wc_get_endpoint_url( 'edit-account' ) ) ?>">
+      <?= __('Edit your password and account details') ?>
+    </a>
+  </li>
+</ul>
+
+<!--
 <p>
 	<?php
 	/* translators: 1: Orders URL 2: Address URL 3: Account URL. */
@@ -55,6 +90,7 @@ $allowed_html = array(
 	);
 	?>
 </p>
+-->
 
 <?php
 	/**

@@ -15,10 +15,9 @@ $query = new WP_Query($args);
 
   <?php if( $query->have_posts() ) :?>
     <?php while( $query->have_posts() ) : $query->the_post(); ?>
-      <div class="tm-border uk-padding uk-margin-medium uk-background-muted">
+      <div class="uk-padding uk-margin-medium uk-background-muted">
         <h2><?= the_title(); ?></h2>
         <?php
-          // get_template_part('layout/form/acf-form', null, ['id' => $post->ID]); 
           the_project_form($post->ID);
         ?>
       </div>

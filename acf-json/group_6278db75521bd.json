@@ -58,7 +58,7 @@
                             "maxlength": ""
                         },
                         {
-                            "key": "field_627946c557de3",
+                            "key": "field_633c14815806c",
                             "label": "Name",
                             "name": "name",
                             "type": "text",
@@ -71,10 +71,10 @@
                                 "id": ""
                             },
                             "default_value": "",
+                            "maxlength": "",
                             "placeholder": "",
                             "prepend": "",
-                            "append": "",
-                            "maxlength": ""
+                            "append": ""
                         },
                         {
                             "key": "field_628d10d3d5d91",
@@ -1302,5 +1302,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1664043219
+    "modified": 1664881886
 }

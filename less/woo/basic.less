@@ -1,0 +1,39 @@
+/* =========================================================== 
+  WooCommerce
+=========================================================== */
+
+.input-text {
+
+  &:focus {
+    outline: none;
+  }
+
+  &.qty {
+    max-width: 80px !important;
+  }
+
+}
+
+.button:not(.uk-button) {
+
+  .uk-button();
+  .uk-button-default();
+
+  &:active, 
+  &:focus, 
+  &:hover {
+    cursor: pointer;
+    background-color: @button-default-hover-background;
+    color: @button-default-hover-color;
+  }
+
+}
+
+abbr.required {
+  color: @global-danger-background;
+  text-decoration: none;
+}
+
+.form-row  {
+  margin: 15px 0;
+}

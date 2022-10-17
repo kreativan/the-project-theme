@@ -15,7 +15,7 @@ $class = ($media_position == 'right') ? " uk-flex-row-reverse" : "";
   <div class="uk-width-<?= $media_size ?>@m">
     <div class="uk-panel">
       <?php
-        picture($image, [
+        tpf_picture($image, [
           'size' => 'x640'
         ])
       ?>

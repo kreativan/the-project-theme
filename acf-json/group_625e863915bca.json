@@ -46,6 +46,25 @@
             "maxlength": ""
         },
         {
+            "key": "field_634d1300061d2",
+            "label": "About",
+            "name": "about",
+            "type": "textarea",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "rows": 2,
+            "placeholder": "",
+            "new_lines": ""
+        },
+        {
             "key": "field_6299d8f7ff357",
             "label": "Site Email",
             "name": "site_email",
@@ -83,26 +102,23 @@
             "maxlength": ""
         },
         {
-            "key": "field_628748cef4483",
-            "label": "Katalog Archive Page",
-            "name": "katalog_archive_page",
-            "type": "post_object",
+            "key": "field_633dbe9929003",
+            "label": "Google Analytics",
+            "name": "google_analytics",
+            "type": "text",
             "instructions": "",
-            "required": 1,
+            "required": 0,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
                 "class": "",
                 "id": ""
             },
-            "post_type": [
-                "page"
-            ],
-            "taxonomy": "",
-            "allow_null": 0,
-            "multiple": 0,
-            "return_format": "object",
-            "ui": 1
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
         }
     ],
     "location": [
@@ -110,7 +126,7 @@
             {
                 "param": "options_page",
                 "operator": "==",
-                "value": "website-settings"
+                "value": "site-settings"
             }
         ]
     ],
@@ -123,5 +139,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1664048231
+    "modified": 1665995596
 }
