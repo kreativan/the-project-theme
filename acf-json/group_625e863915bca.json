@@ -35,34 +35,34 @@
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
-                "width": "",
-                "class": "",
-                "id": ""
-            },
-            "default_value": "",
-            "placeholder": "",
-            "prepend": "",
-            "append": "",
-            "maxlength": ""
-        },
-        {
-            "key": "field_634d1300061d2",
-            "label": "About",
-            "name": "about",
-            "type": "textarea",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "",
+                "width": "40",
                 "class": "",
                 "id": ""
             },
             "default_value": "",
             "maxlength": "",
-            "rows": 2,
             "placeholder": "",
-            "new_lines": ""
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_634e958c8397e",
+            "label": "Tagline",
+            "name": "tagline",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "60",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
         },
         {
             "key": "field_6299d8f7ff357",
@@ -139,5 +139,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1665995596
+    "modified": 1666094579
 }

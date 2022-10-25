@@ -10,7 +10,7 @@
 
 <div class="uk-container tm-container-margin">
 <?php
-  get_template_part("inc/page-builder");
+  get_template_part("layout/base/page-builder");
 ?>
 </div>
 

@@ -12,11 +12,11 @@ $assets_suffix = the_project('assets_suffix');
  * Include your less files here
  */
 $less_files = [
-  the_project_dir() . "/lib/uikit/src/less/uikit.theme.less",
-  the_project_dir() . "/lib/less/mixins.less",
-  the_project_dir() . "/lib/less/wp.less",
-  the_project_dir() . "/lib/less/utility.less",
-  the_project_dir() . "/lib/less/svg.less",
+  tpf_dir() . "/lib/uikit/src/less/uikit.theme.less",
+  tpf_dir() . "/lib/less/mixins.less",
+  tpf_dir() . "/lib/less/wp.less",
+  tpf_dir() . "/lib/less/utility.less",
+  tpf_dir() . "/lib/less/svg.less",
 ];
 
 if(isset($args["less_files"])) {
@@ -31,16 +31,13 @@ if(isset($args["less_files"])) {
 $less_vars = [];
 if(isset($args["less_vars"])) $less_vars = $args["less_vars"];
 
-// Google Fonts LInk
-$google_fonts_link = isset($args['google_fonts_link']) ? $args['google_fonts_link'] : "";
-
 /**
  * JS Files
  * Include your js files here
  */
 $js_files = [
-  the_project_url() . "lib/uikit/dist/js/uikit-core.min.js",
-  the_project_url() . "lib/uikit/dist/js/uikit-icons.min.js",
+  tpf_url() . "lib/uikit/dist/js/uikit-core.min.js",
+  tpf_url() . "lib/uikit/dist/js/uikit-icons.min.js",
 ];
 
 if(isset($args["js_files"])) {
@@ -62,6 +59,14 @@ if(isset($args["js_vars"])) {
   $js_vars = array_merge($js_vars, $args["js_vars"]);
 }
 
+/**
+ * CSS Files
+ */
+$css_files = isset($args['css_files']) ? $args['css_files'] : [];
+
+// Google Fonts LInk
+$google_fonts_link = isset($args['google_fonts_link']) ? $args['google_fonts_link'] : "";
+
 ?>
 
 <?php if($google_fonts_link && $google_fonts_link != "") : ?>
@@ -77,8 +82,21 @@ if(isset($args["js_vars"])) {
 <link rel="preload" href="<?= get_template_directory_uri()."/assets/css/main.css"; ?>" as="style">
 <?php endif; ?>
 
+<!-- Preload CSS -->
+<?php if(count($css_files) > 0) : ?>
+<?php foreach($css_files as $css_file) : ?>
+<link rel="preload" href="<?= $css_file ?>" as="style">
+<?php endforeach;?>
+<?php endif;?>
+
 <!-- UIkit -->
 <link rel="stylesheet" type="text/css" href="<?= $lessCompiler->less($less_files, $less_vars, "main", $dev_mode); ?>">
+
+<?php if(count($css_files) > 0) : ?>
+<?php foreach($css_files as $css_file) : ?>
+<link rel="stylesheet" type="text/css" href="<?= $css_file ?>">
+<?php endforeach;?>
+<?php endif;?>
 
 <!-- js -->
 <?php foreach($js_files as $file) : ?>

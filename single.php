@@ -1,6 +1,6 @@
 <?php get_header(); ?>
 
-<div class="uk-container uk-container-small tm-container-margin">
+<div class="uk-container tm-container-margin">
 
   <h1><?php the_title(); ?></h1>
 
