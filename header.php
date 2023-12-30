@@ -1,68 +1,81 @@
 <?php
 
-// Site language
-$lang = get_option('WPLANG');
-$lang = explode("_", $lang);
-$lang = $lang[0];
-$lang = !empty($lang) ? $lang : 'en';
+// Dev mode
+$dev_mode = the_project('dev_mode') == '1' ? true : false;
+$suffix = $dev_mode ? '' : "?v=" . time();
+$scripts_in_head = get_field('scripts_in_head', 'options');
 
-// Body class/id
-$tmpl = str_replace(".php", "", basename(get_page_template()));
-$body_cls = get_field("ph_enable") ? "is-page-heading" : "";
-$body_cls = get_field("hero_title") ? "is-hero" : "";
+/**
+ * Less Files
+ */
+$less_files = TPF_Less_Files('minimal');
+$less_files[] = get_template_directory() . "/assets/less/_vars.less";
+
+/**
+ * Less Variables
+ */
+$less_vars = [
+  'global-font-family' => 'Inter',
+];
+
+/**
+ * CSS Files
+ */
+$css_files = [
+  get_template_directory_uri() . "/assets/fonts/fonts.css",
+];
+
+/**
+ * JS Files
+ */
+$js_files = TPF_JS_Files();
+
+/**
+ * JS Vars
+ */
+$js_vars = TPF_JS_Vars();
 
 ?>
 
 <!DOCTYPE html>
-<html lang="<?= $lang ?>">
+<html lang="<?= site_lang() ?>">
+
 <head>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <?php
-    // Meta tags
-    get_template_part("inc/_meta");
-    
-    /**
-     * Assets
-     */
-    get_template_part("inc/_head", null, [
-      "less_files" => [
-        get_template_directory() . "/less/vars.less",
-        get_template_directory() . "/less/style.less",
-      ],
-      "less_vars" => [
-        "global-font-family" => "Jost, sans-serif",
-        "base-heading-font-family" => "Jost, sans-serif",
-      ],
-      'css_files' => [
-        get_template_directory_uri() . "/assets/css/fonts.css",
-      ],
-      "js_files" => [
-        tpf_url() . "lib/uikit/dist/js/components/notification.min.js",
-        tpf_url() . "lib/uikit/dist/js/components/slideshow.min.js",
-      ],
-      "js_vars" => [], 
-      // 'google_fonts_link' => "https://fonts.googleapis.com/css2?family=Jost:wght@300;400;700&display=swap",
-    ]);
+  /** TPF head */
+  render("html/head", [
+    "less_files" => $less_files,
+    "less_vars" => $less_vars,
+    'css_files' => $css_files,
+    "js_files" => $js_files,
+    "js_vars" => $js_vars,
+  ]);
 
-    // wp
-    wp_head();
+  /** WP head */
+  wp_head();
+  ?>
+
+  <?php
+  /**
+   * Scripts in head
+   */
+  if (!empty($scripts_in_head) && $scripts_in_head != "") {
+    echo $scripts_in_head;
+  }
   ?>
 
 </head>
 
-<body id="tmpl-<?= $tmpl ?>" class="<?= $body_cls ?>">
+<body>
 
-<?php
-// Mobile Header
-get_template_part("layout/base/mobile-header");
-?>
+  <?php
+  render("layout/base/mobile-header");
+  ?>
 
-<?php
-// Mobile Header
-get_template_part("layout/base/header");
-?>
-
-<main id="main"><!-- main start -->
+  <?php
+  render("layout/base/header");
+  ?>

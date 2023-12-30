@@ -1,43 +1,45 @@
 <?php
-/**
- *  Custom Image Sizes
- *  
- */
-add_image_size('logo', 180, 42, false);
-add_image_size('hero', 1920, null, false);
-add_image_size('container', 1200, null, false);
-add_image_size('x640', 640, null, false);
-add_image_size('x380', 380, null, false);
-add_image_size('thumb', 100, 100, true);
-
-add_image_size('movie_card', 270, 400, true);
-
 
 /**
- * Widget Positions
- *
+ * Load theme text domain
+ * @link https://developer.wordpress.org/reference/functions/load_theme_textdomain/
  */
-function widget_positions() {
+add_action('after_setup_theme', function () {
+  load_theme_textdomain('the-project', get_template_directory() . '/languages');
+});
 
-  register_sidebar([
-    'name' => 'Blog Sidebar',
-    'id' => 'blog-sidebar',
-    'before_widget' => '<div class="uk-panel uk-margin">',
-    'after_widget' => '</div>',
-    'before_title' => '<h3 class="widget-title">',
-    'after_title' => '</h3>',
-  ]);
-
+/**
+ * Global Variables
+ * @param string $name The name of the variable
+ * @return mixed The value of the variable or false if not found
+ * @example variable('color-primary');
+ */
+function variable($name) {
+  $variables = [
+    'color-primary' => '#1e87f0',
+  ];
+  return isset($variables[$name]) ? $variables[$name] : false;
 }
-add_action('widgets_init', 'widget_positions');
-
 
 /**
- * Menus
- *
+ * Custom Image Sizes
+ */
+// add_image_size('xlarge', 1600, null, false);
+
+/**
+ * Menu Positions
+ * @link https://developer.wordpress.org/reference/functions/register_nav_menus/
  */
 register_nav_menus([
-  'navbar' => 'Navbar Location',
-  'mobile-menu' => 'Mobile Menu Location',
-  "footer-menu" => "Footer Menu Location",
+  'navbar' => 'Navbar',
+  'mobile' => 'Mobile',
+  "footer" => "Footer",
 ]);
+
+
+/**
+ * Add ... to the excerpts
+ */
+add_filter('excerpt_more', function () {
+  return "...";
+});

@@ -1,0 +1,1 @@
+In this folder are located all the ACF JSON files. You can create ACF fields in the admin panel and then export them to JSON files. Then you can commit these files to the repository and use them in your project. This is a good practice because you can easily import them to another project or restore them if you accidentally delete them.

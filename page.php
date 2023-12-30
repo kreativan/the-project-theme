@@ -1,16 +1,29 @@
-<?php get_header(); ?>
+<?php
 
-<div class="uk-container tm-container-margin">
-  <div uk-height-viewport="expand: true">
+/**
+ * page.php
+ * Default page template
+ */
 
-    <h1><?php the_title(); ?></h1>
+get_header();
 
+?>
+
+<div id="page-heading" class="uk-section uk-section-muted">
+  <div class="uk-container uk-text-center">
+    <h1>
+      <?= the_title() ?>
+    </h1>
     <?php
-      get_template_part("layout/wp/content");
+    render('layout/common/breadcrumb');
     ?>
-
   </div>
-
 </div>
+
+<main class="uk-section">
+  <div class="uk-container" uk-height-viewport="expand: true">
+    <?php the_content() ?>
+  </div>
+</main>
 
 <?php get_footer(); ?>

@@ -1,11 +1,27 @@
-<?php get_header(); ?>
+<?php
 
-<div class="uk-container tm-container-margin">
+/**
+ * single.php
+ *  Default Single Post Template
+ */
 
-  <h1><?php the_title(); ?></h1>
+get_header();
 
-  <?php get_template_part('layout/wp/blog-post'); ?>
+// Meta
+$date = get_the_date('d M Y');
+$categories = get_the_category();
+$category = $categories[0];
 
-</div>
+$thumb = get_the_post_thumbnail(null, 'large');
+
+?>
+
+<main class="uk-section">
+  <div class="uk-container uk-container-small" uk-height-viewport="expand: true;">
+    <?php
+    render('layout/wp/single');
+    ?>
+  </div>
+</main>
 
 <?php get_footer(); ?>

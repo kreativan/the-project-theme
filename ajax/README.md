@@ -1,0 +1,1 @@
+Here you can create ajax end-points. You can access them by `https://your-domain.com/ajax/your-end-point-name/`.

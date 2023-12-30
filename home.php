@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Archive
- * Default category page, list of posts
+ *  home.php
+ *  Default Blog Page
  */
 
 get_header();
@@ -14,12 +14,7 @@ $queried_object = get_queried_object();
 
 <div id="page-heading" class="uk-section uk-section-muted">
   <div class="uk-container uk-text-center">
-    <h1>
-      <?= $queried_object->name ?>
-    </h1>
-    <?php
-    render('layout/common/breadcrumb');
-    ?>
+    <h1><?= the_title() ?></h1>
   </div>
 </div>
 
@@ -30,6 +25,5 @@ $queried_object = get_queried_object();
     ?>
   </div>
 </main>
-
 
 <?php get_footer(); ?>

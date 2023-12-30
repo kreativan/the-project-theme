@@ -1,0 +1,2 @@
+You can create layout files (front-end components) here and use them in your templates with a `render('layouts/my_folder/my_file.php')` function.
+Also you can override/copy any default layout file from `plugins/the-project-framework/layout/` folder to this folder and modify it.
